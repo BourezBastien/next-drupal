@@ -52,7 +52,7 @@ function getPaginationHref(links?: JsonApiLinks): string | null {
  * for interacting with a Drupal backend in the context of Next.js pages.
  */
 export class NextDrupalPages extends NextDrupal {
-  private serializer: DrupalClientOptions["serializer"]
+  private serializer: NonNullable<DrupalClientOptions["serializer"]>
 
   /**
    * Instantiates a new NextDrupalPages.
@@ -217,8 +217,11 @@ export class NextDrupalPages extends NextDrupal {
       pathPrefix?: PathPrefix
       isVersionable?: boolean
     } & JsonApiOptions
-  ): Promise<T> {
-    const type = typeof input === "string" ? input : input.jsonapi.resourceName
+  ): Promise<T | null> {
+    const type =
+      typeof input === "string"
+        ? input
+        : (input.jsonapi?.resourceName as string)
 
     const previewData = context.previewData as {
       resourceVersion?: string
@@ -227,7 +230,8 @@ export class NextDrupalPages extends NextDrupal {
     options = {
       deserialize: true,
       pathPrefix: "/",
-      withAuth: this.getAuthFromContextAndOptions(context, options),
+      withAuth:
+        this.getAuthFromContextAndOptions(context, options) ?? undefined,
       params: {},
       ...options,
     }
@@ -238,8 +242,8 @@ export class NextDrupalPages extends NextDrupal {
       locale: context.locale,
       defaultLocale: context.defaultLocale,
       withAuth: options?.withAuth,
-      params: options?.params,
-    }
+      params: options?.params ?? {},
+    } as Parameters<NextDrupalPages["getResource"]>[2]
 
     // Check if resource is versionable.
     // Add support for revisions for node by default.
@@ -247,12 +251,14 @@ export class NextDrupalPages extends NextDrupal {
 
     // If the resource is versionable and no resourceVersion is supplied via params.
     // Use the resourceVersion from previewData or fallback to the latest version.
+    const versionedParams = options.params ?? {}
     if (
       isVersionable &&
-      typeof options.params.resourceVersion === "undefined"
+      typeof versionedParams.resourceVersion === "undefined"
     ) {
-      options.params.resourceVersion =
+      versionedParams.resourceVersion =
         previewData?.resourceVersion || "rel:latest-version"
+      options.params = versionedParams
     }
 
     if (typeof input !== "string") {
@@ -342,10 +348,17 @@ export class NextDrupalPages extends NextDrupal {
 
     return await this.getResourceCollection<T>(type, {
       ...options,
-      locale: context.locale,
-      defaultLocale: context.defaultLocale,
-      withAuth: this.getAuthFromContextAndOptions(context, options),
-    })
+      ...(context.locale
+        ? {
+            locale: context.locale,
+            ...(context.defaultLocale
+              ? { defaultLocale: context.defaultLocale }
+              : {}),
+          }
+        : {}),
+      withAuth:
+        this.getAuthFromContextAndOptions(context, options) ?? undefined,
+    } as Parameters<NextDrupalPages["getResourceCollection"]>[1])
   }
 
   /**
@@ -363,9 +376,15 @@ export class NextDrupalPages extends NextDrupal {
   ): Promise<T> {
     return await this.getSearchIndex<T>(name, {
       ...options,
-      locale: context.locale,
-      defaultLocale: context.defaultLocale,
-    })
+      ...(context.locale
+        ? {
+            locale: context.locale,
+            ...(context.defaultLocale
+              ? { defaultLocale: context.defaultLocale }
+              : {}),
+          }
+        : {}),
+    } as Parameters<NextDrupalPages["getSearchIndex"]>[1])
   }
 
   /**
@@ -398,7 +417,8 @@ export class NextDrupalPages extends NextDrupal {
     })
 
     return await this.translatePath(path, {
-      withAuth: this.getAuthFromContextAndOptions(context, options),
+      withAuth:
+        this.getAuthFromContextAndOptions(context, options) ?? undefined,
     })
   }
 
@@ -511,10 +531,12 @@ export class NextDrupalPages extends NextDrupal {
             >(type, {
               deserialize: true,
               locale,
-              defaultLocale: context.defaultLocale,
+              ...(context.defaultLocale
+                ? { defaultLocale: context.defaultLocale }
+                : {}),
               params,
               withAuth: options.withAuth,
-            })
+            } as JsonApiOptions)
 
             return this.buildStaticPathsFromResources(resources, {
               locale,
@@ -685,7 +707,10 @@ export class NextDrupalPages extends NextDrupal {
 
       // Validate the preview url.
       const result = await this.validateDraftUrl(
-        new URL(request.url, `http://${request.headers.host}`).searchParams
+        new URL(
+          request.url ?? "/",
+          `http://${request.headers.host ?? "localhost"}`
+        ).searchParams
       )
 
       const validationPayload = await result.json()
@@ -769,7 +794,7 @@ export class NextDrupalPages extends NextDrupal {
    */
   getAuthFromContextAndOptions(
     context: GetStaticPropsContext,
-    options: JsonApiWithAuthOption
+    options?: JsonApiWithAuthOption
   ) {
     // If not in preview or withAuth is provided, use that.
     if (!context.preview) {

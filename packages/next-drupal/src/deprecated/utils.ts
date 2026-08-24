@@ -110,7 +110,7 @@ export function getPathFromContext(
   context: GetStaticPropsContext,
   prefix = ""
 ) {
-  let { slug } = context.params
+  let { slug } = context.params ?? {}
 
   slug = Array.isArray(slug)
     ? slug.map((s) => encodeURIComponent(s)).join("/")
@@ -122,7 +122,7 @@ export function getPathFromContext(
   }
 
   return !slug
-    ? process.env.DRUPAL_FRONT_PAGE
+    ? (process.env.DRUPAL_FRONT_PAGE ?? "/")
     : prefix
       ? `${prefix}/${slug}`
       : slug
@@ -132,7 +132,7 @@ export function syncDrupalPreviewRoutes(path: string) {
   if (window && window.top !== window.self) {
     window.parent.postMessage(
       { type: "NEXT_DRUPAL_ROUTE_SYNC", path },
-      process.env.NEXT_PUBLIC_DRUPAL_BASE_URL
+      process.env.NEXT_PUBLIC_DRUPAL_BASE_URL || "*"
     )
   }
 }

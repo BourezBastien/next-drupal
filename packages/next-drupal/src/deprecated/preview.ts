@@ -19,18 +19,22 @@ export async function PreviewHandler(
   response?: NextApiResponse,
   options?: PreviewOptions
 ) {
+  if (!request || !response) {
+    throw new Error("PreviewHandler requires a request and a response.")
+  }
+
   const { path, resourceVersion, secret, locale, defaultLocale } = request.query
 
   if (secret !== process.env.DRUPAL_PREVIEW_SECRET) {
     return response.status(401).json({
-      message: options?.errorMessages.secret || "Invalid preview secret.",
+      message: options?.errorMessages?.secret || "Invalid preview secret.",
     })
   }
 
   if (!path) {
     return response
       .status(401)
-      .end({ message: options?.errorMessages.slug || "Invalid slug." })
+      .end({ message: options?.errorMessages?.slug || "Invalid slug." })
   }
 
   let _options: GetResourcePreviewUrlOptions = {
@@ -49,7 +53,7 @@ export async function PreviewHandler(
   if (!url) {
     response
       .status(404)
-      .end({ message: options?.errorMessages.slug || "Invalid slug" })
+      .end({ message: options?.errorMessages?.slug || "Invalid slug" })
   }
 
   response.setPreviewData({

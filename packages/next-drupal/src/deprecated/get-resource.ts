@@ -20,7 +20,7 @@ export async function getResourceFromContext<T extends JsonApiResource>(
     accessToken?: AccessToken
     isVersionable?: boolean
   }
-): Promise<T> {
+): Promise<T | null> {
   options = {
     deserialize: true,
     // Add support for revisions for node by default.
@@ -72,7 +72,7 @@ export async function getResourceByPath<T extends JsonApiResource>(
     deserialize?: boolean
     isVersionable?: boolean
   } & JsonApiWithLocaleOptions
-): Promise<T> {
+): Promise<T | null> {
   options = {
     deserialize: true,
     isVersionable: false,
@@ -97,7 +97,8 @@ export async function getResourceByPath<T extends JsonApiResource>(
     })
   }
 
-  const { resourceVersion = "rel:latest-version", ...params } = options.params
+  const { resourceVersion = "rel:latest-version", ...params } =
+    options.params ?? {}
 
   if (options.isVersionable) {
     params.resourceVersion = resourceVersion
