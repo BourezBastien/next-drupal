@@ -54,6 +54,17 @@ const article = await drupal.getResource(
 
 </Callout>
 
+<Callout type="warning">
+
+**Warning: keep `withAuth` out of public page requests.** If you fetch
+pages with `withAuth: true` (or set `withAuth` globally on the client),
+every page render runs as this scope and **unpublished content becomes
+visible to all visitors**. Reserve authenticated requests for preview
+and draft mode, and fetch public pages unauthenticated — optionally
+filtering with `filter[status]=1` so unpublished content never renders.
+
+</Callout>
+
 ---
 
 ## 3. Create User

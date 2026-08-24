@@ -1133,7 +1133,7 @@ export class NextDrupal extends NextDrupalBase {
       JsonApiWithNextFetchOptions
   ): Promise<{
     items: T[]
-    tree?: DrupalMenuTree<DrupalMenuItem>
+    tree: DrupalMenuTree<DrupalMenuItem>
   }> {
     options = {
       withAuth: this.withAuth,
@@ -1178,9 +1178,11 @@ export class NextDrupal extends NextDrupalBase {
 
     const tree = new DrupalMenuTree(items as DrupalMenuItem[])
 
+    // Always return the tree, even when empty: an undefined tree breaks
+    // getStaticProps serialization. (#793)
     const menu = {
       items,
-      tree: tree.length ? tree : undefined,
+      tree,
     }
 
     /* c8 ignore next 3 */
