@@ -203,6 +203,7 @@ export class NextDrupal extends NextDrupalBase {
       method: "POST",
       body: JSON.stringify(body),
       withAuth: options.withAuth,
+      next: options.next,
       cache: options.cache,
     })
 
@@ -292,6 +293,7 @@ export class NextDrupal extends NextDrupalBase {
       },
       body: body.data.attributes.file,
       withAuth: options.withAuth,
+      next: options.next,
       cache: options.cache,
     })
 
@@ -378,6 +380,7 @@ export class NextDrupal extends NextDrupalBase {
       method: "PATCH",
       body: JSON.stringify(body),
       withAuth: options.withAuth,
+      next: options.next,
       cache: options.cache,
     })
 
@@ -432,6 +435,7 @@ export class NextDrupal extends NextDrupalBase {
     const response = await this.fetch(endpoint, {
       method: "DELETE",
       withAuth: options.withAuth,
+      next: options.next,
       cache: options.cache,
     })
 
@@ -1014,12 +1018,12 @@ export class NextDrupal extends NextDrupalBase {
    * Fetches the JSON:API index.
    *
    * @param {Locale} locale The locale for the request.
-   * @param {JsonApiWithNextFetchOptions} options Options for the request.
+   * @param {JsonApiWithNextFetchOptions & JsonApiWithAuthOption} options Options for the request. Pass withAuth when the index requires authentication.
    * @returns {Promise<JsonApiResponse>} The JSON:API index.
    */
   async getIndex(
     locale?: Locale,
-    options?: JsonApiWithNextFetchOptions
+    options?: JsonApiWithNextFetchOptions & JsonApiWithAuthOption
   ): Promise<JsonApiResponse> {
     const endpoint = await this.buildEndpoint({
       locale,
@@ -1029,7 +1033,8 @@ export class NextDrupal extends NextDrupalBase {
 
     const response = await this.fetch(endpoint, {
       // As per https://www.drupal.org/node/2984034 /jsonapi is public.
-      withAuth: false,
+      // Sites that protect it can opt into authenticated requests.
+      withAuth: options?.withAuth ?? false,
       next: options?.next,
       cache: options?.cache,
     })
