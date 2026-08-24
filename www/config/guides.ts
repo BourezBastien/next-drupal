@@ -57,6 +57,10 @@ export const guidesConfig: GuidesConfig = {
           title: "Require Login",
           href: "/guides/require-login",
         },
+        {
+          title: "SEO",
+          href: "/guides/seo",
+        },
       ],
     },
   ],
