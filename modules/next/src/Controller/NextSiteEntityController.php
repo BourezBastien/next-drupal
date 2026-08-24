@@ -3,9 +3,11 @@
 namespace Drupal\next\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
+use Drupal\Core\Url;
 use Drupal\next\Entity\NextSiteInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Routing\Exception\RouteNotFoundException;
 
 /**
  * Controller for next_site entities.
@@ -56,10 +58,22 @@ class NextSiteEntityController extends ControllerBase {
       'NEXT_IMAGE_DOMAIN' => $this->request->getHost(),
     ];
 
+    // Resolve the consumer collection path through the routing system so
+    // the hint stays correct if the consumers module ever moves its
+    // administrative pages. Fall back to the canonical path when the route
+    // is unavailable so this diagnostic page never fatals.
+    try {
+      $consumer_collection_url = Url::fromRoute('entity.consumer.collection')
+        ->toString();
+    }
+    catch (RouteNotFoundException $exception) {
+      $consumer_collection_url = '/admin/config/services/consumer';
+    }
+
     $variables += [
       'authentication_bearer' => '# Authentication',
-      'DRUPAL_CLIENT_ID' => 'Retrieve this from /admin/config/services/consumer',
-      'DRUPAL_CLIENT_SECRET' => 'Retrieve this from /admin/config/services/consumer',
+      'DRUPAL_CLIENT_ID' => 'Retrieve this from ' . $consumer_collection_url,
+      'DRUPAL_CLIENT_SECRET' => 'Retrieve this from ' . $consumer_collection_url,
     ];
 
     if ($revalidate_secret = $next_site->getRevalidateSecret()) {
