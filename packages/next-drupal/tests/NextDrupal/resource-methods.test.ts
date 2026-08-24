@@ -1546,6 +1546,20 @@ describe("translatePath()", () => {
     expect(path).toBeNull()
   })
 
+  test("returns null for archived content (403)", async () => {
+    const drupal = new NextDrupal(BASE_URL)
+
+    spyOnFetch({
+      status: 403,
+      statusText: "Forbidden",
+      responseBody: mocks.resources.translatePath.forbidden,
+    })
+
+    const path = await drupal.translatePath("/path-is-archived")
+
+    expect(path).toBeNull()
+  })
+
   test("throws an error on server error", async () => {
     const drupal = new NextDrupal(BASE_URL)
 
