@@ -1,6 +1,6 @@
 # Testing
 
-## next-drupal
+## next-drupal (NPM package)
 
 To run the tests for `next-drupal`, run:
 
@@ -8,25 +8,59 @@ To run the tests for `next-drupal`, run:
 yarn test
 ```
 
-## Next module
+Most tests require a running Drupal instance with credentials (see
+below), but the pure unit tests can run anywhere without a live Drupal:
 
-Tests for the `next` module use PHPUnit. To run the tests:
+```
+cd packages/next-drupal
+DRUPAL_BASE_URL=http://localhost \
+DRUPAL_CLIENT_ID=test \
+DRUPAL_CLIENT_SECRET=test \
+npx jest tests/NextDrupalBase tests/Logger tests/DrupalMenuTree tests/draft --coverage=false
+```
 
-1. Run `composer install` inside the `/drupal` directory.
-2. Then run `yarn test:next` from the root of the repo to run the PHPUnit tests.
+Without these environment variables the test bootstrap fails with
+`The 'baseUrl' param is required` — copy
+`packages/next-drupal/.env.example` to `packages/next-drupal/.env` or
+export the variables before running. (#533)
 
-Note: We have a CI for running these tests on GitHub Actions.
+The full suite additionally needs a live Drupal site (OAuth consumer,
+seeded umami-style content) provisioned by the maintainers; roughly 86
+network tests fail without it. Treat that as the baseline when running
+locally, not as regressions.
+
+## Next module (PHP)
+
+Tests for the `next` module use PHPUnit.
+
+1. Set up a Drupal 10 test project (see `test/e2e/install-drupal.sh` for
+   a working recipe, or `.agents/skills/next-drupal-dev/SKILL.md`).
+2. Copy `modules/next` into the project's `web/modules/`.
+3. Run PHPUnit against it:
+
+```
+SIMPLETEST_DB="sqlite://localhost/:memory:" \
+SIMPLETEST_BASE_URL="http://127.0.0.1:8080" \
+../vendor/bin/phpunit -c core modules/next
+```
+
+Static analysis: `phpstan analyse` (level 5, `phpstan.neon`) and
+`phpcs` with `modules/next/phpcs.xml`.
 
 ## End-to-end tests
 
-We use Cypress to run end-to-end tests for the examples.
+The deterministic, self-hosted pipeline lives in `test/e2e` — see
+`test/e2e/README.md`. It installs a local Drupal site seeded by
+`next_tests_seed` and runs Cypress specs against both the JSON:API and
+a Next.js app, with no external database required:
 
-_You will need a copy of the database and files on your local machine to run the tests. These are not tracked in this repo. You can reach out to Chapter Three to get a copy._
+```
+./test/e2e/install-drupal.sh
+(cd .phpunit-drupal && ./vendor/bin/drush runserver 127.0.0.1:8090 &)
+cd test/e2e/next-app && DRUPAL_BASE_URL=http://127.0.0.1:8090 npx next build && DRUPAL_BASE_URL=http://127.0.0.1:8090 npx next start &
+npx cypress run --project test/e2e
+```
 
-_TODO: Add a test profile that builds the Drupal site from config with demo content._
-
-To run the tests:
-
-1. Setup the Drupal site with the database and files.
-2. Run `yarn` from the root of the monorepo to install dependencies.
-3. Then run `yarn test:e2e:ci` to run the tests.
+The legacy example suites under `examples/*/cypress` assert content
+that only exists in Chapter Three's private test database; obtaining a
+copy is tracked in `docs/PLAN.md`.
