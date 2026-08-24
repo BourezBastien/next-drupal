@@ -5,12 +5,18 @@ namespace Drupal\Tests\next\Kernel\Plugin;
 use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\Core\Language\LanguageInterface;
+use Drupal\Core\Url;
 use Drupal\next\Entity\NextEntityTypeConfig;
 use Drupal\next\Entity\NextSite;
+use Drupal\next\Event\EntityActionEvent;
+use Drupal\next\Event\EntityActionEventInterface;
 use Drupal\node\Entity\NodeType;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
+use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -31,8 +37,10 @@ class PathRevalidatorTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
+    'content_translation',
     'field',
     'filter',
+    'language',
     'next',
     'node',
     'system',
@@ -181,6 +189,46 @@ class PathRevalidatorTest extends KernelTestBase {
       'redirect_source' => 'old-blog',
     ]);
     $this->container->get('kernel')->terminate(Request::create('/'), new Response());
+  }
+
+  /**
+   * @covers ::revalidate
+   */
+  public function testRevalidateDeletedTranslation() {
+    // Enable Dutch and content translation for page nodes.
+    ConfigurableLanguage::createFromLangcode('nl')->save();
+    $this->container->get('content_translation.manager')
+      ->setEnabled('node', 'page', TRUE);
+
+    $page = $this->createNode([
+      'type' => 'page',
+      'title' => 'Test page',
+    ]);
+    $page->addTranslation('nl', ['title' => 'Testpagina'])->save();
+
+    // The entity action event created for the deleted translation must
+    // carry the translation's language, so that URL generation resolves to
+    // the localized path of the deleted translation.
+    $event = EntityActionEvent::createFromEntity(
+      $page->getTranslation('nl'),
+      EntityActionEventInterface::DELETE_ACTION
+    );
+
+    $url = $event->getEntityUrl();
+    $this->assertInstanceOf(Url::class, $url);
+    $this->assertSame(
+      'nl',
+      $url->getOption('language')->getId(),
+      'The entity URL carries the translation language.'
+    );
+
+    // Sanity check: the event for the default translation keeps the
+    // default language.
+    $event = EntityActionEvent::createFromEntity(
+      $page,
+      EntityActionEventInterface::DELETE_ACTION
+    );
+    $this->assertSame('en', $event->getEntityUrl()->getOption('language')->getId());
   }
 
 }

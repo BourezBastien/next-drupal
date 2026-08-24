@@ -77,7 +77,11 @@ class EntityActionEvent extends Event implements EntityActionEventInterface {
     $next_entity_type_manager = \Drupal::service('next.entity_type.manager');
 
     $sites = $next_entity_type_manager->getSitesForEntity($entity);
-    $url = $entity->hasLinkTemplate('canonical') ? $entity->toUrl() : NULL;
+    // Pass the entity language so translated entities resolve to the URL of
+    // the translation that changed, e.g. when a translation is deleted.
+    $url = $entity->hasLinkTemplate('canonical')
+      ? $entity->toUrl('canonical', ['language' => $entity->language()])
+      : NULL;
 
     // Redirect entities (redirect module) have an admin canonical URL which
     // is never cached by the frontend. Revalidate the redirect source path
