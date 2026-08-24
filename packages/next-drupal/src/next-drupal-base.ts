@@ -48,11 +48,11 @@ export class NextDrupalBase {
 
   withAuth: boolean
 
-  private _apiPrefix: string
+  private _apiPrefix!: string
 
   private _auth?: NextDrupalAuth
 
-  private _headers: Headers
+  private _headers!: Headers
 
   private _token?: AccessToken
 
@@ -593,9 +593,14 @@ export class NextDrupalBase {
         body: JSON.stringify(Object.fromEntries(searchParams.entries())),
       })
     } catch (error) {
-      response = new Response(JSON.stringify({ message: error.message }), {
-        status: 401,
-      })
+      response = new Response(
+        JSON.stringify({
+          message: error instanceof Error ? error.message : String(error),
+        }),
+        {
+          status: 401,
+        }
+      )
     }
 
     this.debug(

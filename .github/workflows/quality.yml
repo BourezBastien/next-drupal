@@ -22,7 +22,7 @@ jobs:
         run: yarn format:check
       - name: Lint
         run: yarn lint
-      - name: Typecheck (next-drupal, noImplicitAny)
+      - name: Typecheck (next-drupal, strict)
         run: npx tsc --noEmit -p packages/next-drupal/tsconfig.json
       - name: Unit tests (no live Drupal)
         # ~86 pre-existing tests require a live Drupal instance with secrets

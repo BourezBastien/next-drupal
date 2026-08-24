@@ -779,7 +779,9 @@ export class NextDrupalPages extends NextDrupal {
 
       return response.end()
     } catch (error) {
-      this.debug(`Preview failed: ${error.message}`)
+      this.debug(
+        `Preview failed: ${error instanceof Error ? error.message : String(error)}`
+      )
       return response.status(422).end()
     }
   }
