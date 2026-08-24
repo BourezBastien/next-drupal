@@ -6,4 +6,5 @@ core_version_requirement: ^10 || ^11
 dependencies:
   - drupal:node
   - drupal:path
+  - drupal:media
   - drupal:menu_ui

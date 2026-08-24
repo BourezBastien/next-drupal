@@ -7,6 +7,7 @@
 
 declare(strict_types=1);
 
+use Drupal\Core\File\FileSystemInterface;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
 
@@ -88,6 +89,45 @@ function next_tests_seed_install(): void {
         'menu_name' => 'main',
         'link' => ['uri' => 'internal:/next-tests/home'],
         'uuid' => '00000000-0000-0000-0000-0000000000aa',
+      ])->save();
+    }
+  }
+
+  // An image media, for media-based features (image rendering, meta alt).
+  // The image media type ships with the standard install; kernel test
+  // environments may enable media without its config, so guard on it.
+  if (\Drupal::moduleHandler()->moduleExists('media')
+    && \Drupal::entityTypeManager()->getStorage('media_type')->load('image')) {
+    $media_storage = \Drupal::entityTypeManager()->getStorage('media');
+    if (!$media_storage->loadByProperties(['name' => 'Next tests image'])) {
+      $directory = 'public://next-tests';
+      /** @var \Drupal\Core\File\FileSystemInterface $file_system */
+      $file_system = \Drupal::service('file_system');
+      if (!is_dir($directory)) {
+        $file_system->mkdir($directory);
+      }
+
+      // A minimal valid 1x1 transparent PNG.
+      $png = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==');
+      file_put_contents('public://next-tests/next-tests.png', $png);
+      $file = \Drupal::entityTypeManager()->getStorage('file')->create([
+        'uri' => 'public://next-tests/next-tests.png',
+        'status' => 1,
+        'uid' => 1,
+      ]);
+      $file->save();
+
+      $media_storage->create([
+        'bundle' => 'image',
+        'name' => 'Next tests image',
+        'uid' => 1,
+        'status' => 1,
+        'field_media_image' => [
+          'target_id' => $file->id(),
+          'alt' => 'Deterministic next-drupal test image',
+          'title' => 'Next tests image',
+        ],
+        'uuid' => '00000000-0000-0000-0000-0000000000bb',
       ])->save();
     }
   }
