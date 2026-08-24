@@ -237,7 +237,10 @@ class EntityOwner extends ConfigurableSiteResolverBase implements ContainerFacto
   protected function getUsersFromUuids(array $uuids): array {
     /** @var \Drupal\user\UserStorageInterface $user_storage */
     $user_storage = $this->entityTypeManager->getStorage('user');
-    $uids = $user_storage->getQuery()->condition('uuid', $uuids, 'IN')->execute();
+    $uids = $user_storage->getQuery()
+      ->accessCheck(FALSE)
+      ->condition('uuid', $uuids, 'IN')
+      ->execute();
     return $uuids ? $user_storage->loadMultiple($uids) : [];
   }
 

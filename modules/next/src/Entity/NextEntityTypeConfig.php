@@ -110,7 +110,7 @@ class NextEntityTypeConfig extends ConfigEntityBase implements NextEntityTypeCon
   /**
    * The plugin collection that stores revalidator plugins.
    *
-   * @var \Drupal\next\SiteResolverPluginCollection
+   * @var \Drupal\next\RevalidatorPluginCollection
    */
   protected $revalidatorPluginCollection;
 

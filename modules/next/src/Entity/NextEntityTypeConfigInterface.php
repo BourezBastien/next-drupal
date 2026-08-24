@@ -42,7 +42,7 @@ interface NextEntityTypeConfigInterface extends ConfigEntityInterface, EntityWit
   /**
    * Returns the revalidator plugin.
    *
-   * @return \Drupal\next\Plugin\Next\Revalidator\|null
+   * @return \Drupal\next\Plugin\RevalidatorInterface|null
    *   The revalidator plugin used by this entity.
    */
   public function getRevalidator(): ?RevalidatorInterface;

@@ -329,6 +329,8 @@ class NextEntityTypeConfigForm extends EntityForm {
       ]));
 
     $form_state->setRedirectUrl($entity->toUrl('collection'));
+
+    return $status;
   }
 
   /**

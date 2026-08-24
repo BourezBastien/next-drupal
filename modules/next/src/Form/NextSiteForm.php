@@ -113,6 +113,8 @@ class NextSiteForm extends EntityForm {
     ]));
 
     $form_state->setRedirectUrl($next_site->toUrl('collection'));
+
+    return $status;
   }
 
 }
