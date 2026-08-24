@@ -47,3 +47,4 @@ yarn-error.log*
 # AI tool-local dirs
 .claude/
 .phpunit-drupal/
+test/e2e/next-app/.next/
