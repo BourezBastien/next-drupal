@@ -93,13 +93,16 @@ mergeable ones likely obsolete: #67, #306, #425, #446, #491.
   token (build workers + runtime instances). Expected behavior; a shared token
   cache would be an opt-in feature, not a bug fix.
 
-## Resolved on the fork (status as of session 10)
+## Resolved on the fork (status as of session 11)
 
 #854, #499, #874, #912, #861, #855, #859, #847, #911, #862, #848, #850, #686, #799, #681, #772, #722, #779, #155, #346, #650, #793, #813, #818, #246, #533, #783 (docs ddev/consommateur), #806 (numérotation umami + patches déjà corrigés), #611 (pattern next-auth preview), #653 (base_url rendered as a link in the next_site listing, kernel-tested), #696 (Path revalidator logs non-200 responses as warnings, kernel-tested), #615 (consumer collection path resolved via Url::fromRoute with a safe fallback, kernel-tested), #532 + #535 (version added to modules/next/package.json — no more yarn workspace warning; the workspace package is renamed next-drupal-module because the original "next" name shadowed the Next.js framework once versioned), #422 + #493 (preview secret expiration documented in known-issues.mdx: refresh the preview or raise secret_expiration),
 #325 (translatePath now sends Accept: application/json — the decoupled_router route requires the json format and older Drupal versions fail to negotiate application/vnd.api+json to it; jest-tested),
 #326 (example-umami JWT cache keyed by the Drupal user id decoded from the token claims, so rotated tokens land in the same entry and sessions no longer share entries by rotating access tokens),
 #419 (Drupal cache recommendations documented in cache.mdx),
-#437 (authenticated user details via hook_simple_oauth_private_claims_alter documented in password-grant.mdx).
+#437 (authenticated user details via hook_simple_oauth_private_claims_alter documented in password-grant.mdx),
+#467 (to-many relationship bodies — the JsonApiResourceBodyRelationship union has supported arrays since the #874 fix; locked in with a mocked createResource jest test),
+#468 (path of the created resource available on the deserialized response — redirect example documented in creating-resources.mdx),
+#456 (paginated collections — the withMeta option returns {results, meta, links}; example documented in fetching-resources.mdx).
 
 Already resolved by adopted/other work (no further action): #148 (preview alerts already use a plain <a>, fix from the issue thread applied upstream), #740 (flaky coverage — Node bug mitigated by the .nvmrc v18.19 pin, referenced in .nvmrc), #838 (v1.6 menu link already correct), #581 (ESM + sideEffects:false already shipped), #746 (fixed by adopted PR #747),
 #589 (permission list incl. View all revisions already in the draft-mode guide),
@@ -112,7 +115,9 @@ client_credentials grant),
 #158 (front page per locale needs a locale→frontPage map — API design decision,
 documented workaround in the issue; deferred),
 #613 (Turbopack: nothing bundler-specific in the client — plain fetch + qs;
-support follows the Next.js version, no action possible in the library).
+support follows the Next.js version, no action possible in the library),
+#530 (.nvmrc already pinned to v18.19 with the #740 justification; engines
+keeps >=16 for the 2.x line per the upstream decision to drop v16 in 3.x).
 Adopted upstream PRs: #865, #790, #791, #842, #904, #853, #844, #876, #856
 (adapted as `host` option), #860 (#846 was already fixed upstream by #887).
 
