@@ -808,6 +808,60 @@ describe("getResourceFromContext()", () => {
     expect(url).toContain(`fields%5Bnode--recipe%5D=title%2Cdefault_langcode`)
   })
 
+  test("does not mutate the caller's context.locale", async () => {
+    const drupal = new NextDrupalPages(BASE_URL)
+
+    // getResourceByPath resolves through subrequests: 207 with a
+    // resolvedResource section whose body is a JSON string.
+    const resolved = {
+      data: {
+        type: "node--recipe",
+        id: "11111111-1111-1111-1111-111111111111",
+        attributes: {
+          title: "Recipe",
+          langcode: "de",
+          default_langcode: true,
+        },
+      },
+    }
+    const fetchSpy = spyOnFetch({
+      status: 207,
+      responseBody: {
+        router: {
+          body: JSON.stringify({}),
+        },
+        "resolvedResource#uri{0}": {
+          body: JSON.stringify(resolved),
+        },
+      },
+    })
+
+    const context = {
+      locale: "de-de",
+      defaultLocale: "de-de",
+      params: {
+        slug: ["recipes", "quiche"],
+      },
+    } as GetStaticPropsContext
+
+    // Path-based resolution (no uuid): the entity langcode drives the path
+    // lookup, but the caller's context must stay untouched. (#466)
+    await drupal.getResourceFromContext(
+      {
+        entity: {
+          langcode: "de",
+        },
+      } as never,
+      context
+    )
+
+    expect(context.locale).toBe("de-de")
+    // The entity langcode still prefixes the resolved path inside the
+    // subrequests blueprint.
+    const body = fetchSpy.mock.calls[0][1].body as string
+    expect(body).toContain("/de/recipes/quiche")
+  })
+
   test("fetches a resource from context", async () => {
     const drupal = new NextDrupalPages(BASE_URL)
     const context: GetStaticPropsContext = {

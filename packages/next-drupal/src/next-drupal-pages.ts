@@ -282,6 +282,9 @@ export class NextDrupalPages extends NextDrupal {
       params: options?.params ?? {},
     } as Parameters<NextDrupalPages["getResource"]>[2]
 
+    // Resolve the entity langcode for the path lookup without mutating the
+    // caller's context. (#466)
+    let pathLocale = context.locale
     if (typeof input !== "string") {
       // Fix for subrequests and translation.
       // TODO: Confirm if we still need this after https://www.drupal.org/i/3111456.
@@ -290,8 +293,8 @@ export class NextDrupalPages extends NextDrupal {
       // translate to the untranslated version and set the locale to es.
       // However a subrequests to /es/subrequests for decoupled router will fail.
       /* c8 ignore next 3 */
-      if (context.locale && input.entity.langcode !== context.locale) {
-        context.locale = input.entity.langcode
+      if (pathLocale && input.entity.langcode !== pathLocale) {
+        pathLocale = input.entity.langcode
       }
 
       // Given we already have the path info, we can skip subrequests and just make a simple
@@ -301,9 +304,12 @@ export class NextDrupalPages extends NextDrupal {
       }
     }
 
-    const path = this.getPathFromContext(context, {
-      pathPrefix: options?.pathPrefix,
-    })
+    const path = this.getPathFromContext(
+      { ...context, locale: pathLocale },
+      {
+        pathPrefix: options?.pathPrefix,
+      }
+    )
 
     const resource = await this.getResourceByPath<T>(path, _options)
 
