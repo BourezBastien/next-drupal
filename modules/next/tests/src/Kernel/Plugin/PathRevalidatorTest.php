@@ -6,6 +6,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\language\Entity\ConfigurableLanguage;
+use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Url;
 use Drupal\next\Entity\NextEntityTypeConfig;
 use Drupal\next\Entity\NextSite;
@@ -15,6 +16,7 @@ use Drupal\node\Entity\NodeType;
 use Drupal\Tests\node\Traits\NodeCreationTrait;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
+use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -134,6 +136,51 @@ class PathRevalidatorTest extends KernelTestBase {
     $client->request('GET', 'http://blog.com/api/revalidate?path=/blog')->shouldBeCalled()->willReturn(new GuzzleResponse());
     $page = $this->createNode();
     $page->save();
+    $this->container->get('kernel')->terminate(Request::create('/'), new Response());
+  }
+
+  /**
+   * @covers ::revalidate
+   */
+  public function testRevalidateFailureIsLogged() {
+    /** @var \GuzzleHttp\ClientInterface $client */
+    $client = $this->prophesize(ClientInterface::class);
+    $this->container->set('http_client', $client->reveal());
+
+    /** @var \Drupal\Core\Logger\LoggerChannelInterface|\Prophecy\Prophecy\ObjectProphecy $logger */
+    $logger = $this->prophesize(LoggerChannelInterface::class);
+    $this->container->set('logger.channel.next', $logger->reveal());
+
+    NextSite::create([
+      'id' => 'blog',
+      'revalidate_url' => 'http://blog.com/api/revalidate',
+    ])->save();
+
+    NextEntityTypeConfig::create([
+      'id' => 'node.page',
+      'site_resolver' => 'site_selector',
+      'configuration' => [
+        'sites' => [
+          'blog' => 'blog',
+        ],
+      ],
+      'revalidator' => 'path',
+      'revalidator_configuration' => [
+        'revalidate_page' => TRUE,
+      ],
+    ])->save();
+
+    $client->request('GET', 'http://blog.com/api/revalidate?path=/node/1')
+      ->shouldBeCalled()
+      ->willReturn(new GuzzleResponse(500));
+
+    // Non-200 responses must surface in the logs, not pass silently.
+    $logger->warning(
+      Argument::containingString('Failed to revalidate path'),
+      Argument::any()
+    )->shouldBeCalled();
+
+    $this->createNode(['type' => 'page']);
     $this->container->get('kernel')->terminate(Request::create('/'), new Response());
   }
 

@@ -4,6 +4,7 @@ namespace Drupal\next\Plugin\Next\Revalidator;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Url;
+use Drupal\Core\Utility\Error;
 use Drupal\next\Event\EntityActionEvent;
 use Drupal\next\Plugin\ConfigurableRevalidatorBase;
 use Drupal\next\Plugin\RevalidatorInterface;
@@ -131,9 +132,19 @@ class Path extends ConfigurableRevalidatorBase implements RevalidatorInterface {
 
             $revalidated = TRUE;
           }
+          else {
+            $status_code = $response ? $response->getStatusCode() : 'unknown';
+            $this->logger->warning('(@action): Failed to revalidate path %path for the site %site. HTTP status: %status. URL: %url', [
+              '@action' => $event->getAction(),
+              '%path' => $path,
+              '%site' => $site->label(),
+              '%status' => $status_code,
+              '%url' => $revalidate_url->toString(),
+            ]);
+          }
         }
         catch (\Exception $exception) {
-          $this->logger->error($exception->getMessage());
+          Error::logException($this->logger, $exception);
           $revalidated = FALSE;
         }
       }
