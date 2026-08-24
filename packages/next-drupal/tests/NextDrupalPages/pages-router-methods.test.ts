@@ -7,6 +7,7 @@ import {
   mocks,
   spyOnDrupalFetch,
   spyOnFetch,
+  spyOnFetchOnce,
 } from "../utils"
 import type {
   DrupalNode,
@@ -1016,6 +1017,90 @@ describe("getSearchIndexFromContext()", () => {
 })
 
 describe("getStaticPathsFromContext()", () => {
+  test("follows pagination links to build paths for every page", async () => {
+    const drupal = new NextDrupalPages(BASE_URL)
+
+    // The JSON:API index resolves the collection endpoint.
+    spyOnFetchOnce({
+      status: 200,
+      responseBody: {
+        links: {
+          "node--article": {
+            href: `${BASE_URL}/jsonapi/node--article`,
+          },
+        },
+      },
+    })
+    const secondPageUrl = `${BASE_URL}/jsonapi/node--article?page=2`
+    spyOnFetchOnce({
+      status: 200,
+      responseBody: {
+        data: [
+          {
+            type: "node--article",
+            id: "11111111-1111-1111-1111-111111111111",
+            attributes: { path: { alias: "/page-one" } },
+          },
+        ],
+        links: { next: { href: secondPageUrl } },
+      },
+    })
+    spyOnFetchOnce({
+      status: 200,
+      responseBody: {
+        data: [
+          {
+            type: "node--article",
+            id: "22222222-2222-2222-2222-222222222222",
+            attributes: { path: { alias: "/page-two" } },
+          },
+        ],
+        links: {},
+      },
+    })
+
+    const paths = await drupal.getStaticPathsFromContext("node--article", {})
+
+    expect(paths).toEqual([
+      { params: { slug: ["page-one"] } },
+      { params: { slug: ["page-two"] } },
+    ])
+  })
+
+  test("makes a single request when there is no next page", async () => {
+    const drupal = new NextDrupalPages(BASE_URL)
+
+    spyOnFetchOnce({
+      status: 200,
+      responseBody: {
+        links: {
+          "node--article": {
+            href: `${BASE_URL}/jsonapi/node--article`,
+          },
+        },
+      },
+    })
+    const fetchSpy = spyOnFetchOnce({
+      status: 200,
+      responseBody: {
+        data: [
+          {
+            type: "node--article",
+            id: "11111111-1111-1111-1111-111111111111",
+            attributes: { path: { alias: "/only-page" } },
+          },
+        ],
+        links: {},
+      },
+    })
+
+    const paths = await drupal.getStaticPathsFromContext("node--article", {})
+
+    expect(paths).toEqual([{ params: { slug: ["only-page"] } }])
+    // Two requests total: the JSON:API index and the single collection page.
+    expect(fetchSpy).toHaveBeenCalledTimes(2)
+  })
+
   test("returns static paths from context", async () => {
     const drupal = new NextDrupalPages(BASE_URL)
 
