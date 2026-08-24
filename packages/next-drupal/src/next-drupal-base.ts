@@ -391,7 +391,7 @@ export class NextDrupalBase {
    * @returns {string} The constructed path.
    */
   constructPathFromSegment(
-    segment: string | string[],
+    segment?: string | string[],
     options: {
       locale?: Locale
       defaultLocale?: Locale

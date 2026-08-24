@@ -8,11 +8,11 @@ export async function getResourceTypeFromContext(
     accessToken?: AccessToken
     prefix?: string
   }
-): Promise<string> {
+): Promise<string | null> {
   try {
     const response = await translatePathFromContext(context, options)
 
-    return response.jsonapi.resourceName
+    return response?.jsonapi?.resourceName ?? null
   } catch (error) {
     return null
   }

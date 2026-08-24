@@ -6,8 +6,8 @@ import type { DrupalMenuItem } from "../types"
 export function useMenu<T extends DrupalMenuItem>(
   name: string
 ): {
-  items: T[]
-  tree: T[]
+  items?: T[]
+  tree?: T[]
   error: unknown
   isLoading: boolean
 } {
@@ -15,7 +15,7 @@ export function useMenu<T extends DrupalMenuItem>(
   const [data, setData] = useState<{
     items: T[]
     tree: T[]
-  }>(null)
+  } | null>(null)
   const [error, setError] = useState(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
