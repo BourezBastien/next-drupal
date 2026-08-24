@@ -60,6 +60,12 @@ describe("addLocalePrefix()", () => {
       })
     ).toBe("/en/foo")
   })
+
+  test("keeps the prefix for the default locale when defaultLocale is omitted", () => {
+    // Drupal can be configured to prefix the default language too. Omitting
+    // defaultLocale keeps the prefix so prefixed-default setups resolve.
+    expect(drupal.addLocalePrefix("/foo", { locale: "es" })).toBe("/es/foo")
+  })
 })
 
 describe("buildUrl()", () => {
