@@ -20,10 +20,18 @@ export interface JsonApiResponse extends Record<string, any> {
 }
 
 export interface JsonApiResourceBodyRelationship {
-  data: {
-    type: string
-    id: string
-  }
+  data:
+    | {
+        type: string
+        id: string
+        // Relationship metadata, e.g. alt text for media image references.
+        meta?: Record<string, any>
+      }
+    | Array<{
+        type: string
+        id: string
+        meta?: Record<string, any>
+      }>
 }
 
 export interface JsonApiCreateResourceBody {
