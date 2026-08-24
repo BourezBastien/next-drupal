@@ -95,7 +95,10 @@ mergeable ones likely obsolete: #67, #306, #425, #446, #491.
 
 ## Resolved on the fork (status as of session 3)
 
-#854, #499, #874, #912, #861, #855, #859, #847, #911, #862, #848, #850, #686, #799, #681, #772, #722, #779, #155, #346, #650.
+#854, #499, #874, #912, #861, #855, #859, #847, #911, #862, #848, #850, #686, #799, #681, #772, #722, #779, #155, #346, #650, #793, #813, #818, #246, #533.
+
+Already resolved by adopted/other work (no further action): #746 (fixed by adopted PR #747),
+#589 (permission list incl. View all revisions already in the draft-mode guide).
 Adopted upstream PRs: #865, #790, #791, #842, #904, #853, #844, #876, #856
 (adapted as `host` option), #860 (#846 was already fixed upstream by #887).
 
