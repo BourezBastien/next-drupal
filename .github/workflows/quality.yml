@@ -1,0 +1,71 @@
+name: Quality
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  javascript:
+    name: JS - lint, types, unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18.19
+          cache: yarn
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+      - name: Format check
+        run: yarn format:check
+      - name: Lint
+        run: yarn lint
+      - name: Typecheck (next-drupal, noImplicitAny)
+        run: npx tsc --noEmit -p packages/next-drupal/tsconfig.json
+      - name: Unit tests (no live Drupal)
+        run: yarn workspace next-drupal test --coverage=false
+        env:
+          DRUPAL_BASE_URL: http://localhost
+          DRUPAL_CLIENT_ID: test
+          DRUPAL_CLIENT_SECRET: test
+
+  php:
+    name: PHP ${{ matrix.php }} - Drupal ${{ matrix.drupal }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ["8.3"]
+        drupal: ["10.6.x"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv
+          coverage: none
+          tools: composer:v2
+      - name: Setup Drupal
+        run: |
+          COMPOSER_MEMORY_LIMIT=-1 composer create-project drupal/recommended-project:${{ matrix.drupal }} ~/drupal --no-interaction --no-install
+          cd ~/drupal
+          composer config minimum-stability dev
+          composer config prefer-stable true
+          composer config repositories.0 composer https://packages.drupal.org/8
+          COMPOSER_MEMORY_LIMIT=-1 composer require "drupal/core-dev-pinned:${{ matrix.drupal }}" drupal/coder --no-interaction -W
+      - name: Run phpcs
+        run: ~/drupal/vendor/bin/phpcs -p -s --colors --standard=modules/next/phpcs.xml modules/next
+      - name: Copy module
+        run: cp -R modules/next ~/drupal/web/modules/next
+      - name: Run php built-in server
+        run: php -S 127.0.0.1:8080 -t ~/drupal/web &
+      - name: Run PHPUnit
+        run: |
+          cd ~/drupal/web
+          ../vendor/bin/phpunit -c core --no-coverage modules/next
+        env:
+          SYMFONY_DEPRECATIONS_HELPER: weak
+          SIMPLETEST_DB: sqlite://localhost/:memory:
+          SIMPLETEST_BASE_URL: http://127.0.0.1:8080
