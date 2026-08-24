@@ -4,6 +4,7 @@ namespace Drupal\next\Event;
 
 use Drupal\Component\EventDispatcher\Event;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Url;
 
 /**
@@ -77,6 +78,26 @@ class EntityActionEvent extends Event implements EntityActionEventInterface {
 
     $sites = $next_entity_type_manager->getSitesForEntity($entity);
     $url = $entity->hasLinkTemplate('canonical') ? $entity->toUrl() : NULL;
+
+    // Redirect entities (redirect module) have an admin canonical URL which
+    // is never cached by the frontend. Revalidate the redirect source path
+    // instead, so the page serving the old redirect is purged.
+    if ($entity instanceof FieldableEntityInterface && $entity->hasField('redirect_source')) {
+      $item = $entity->get('redirect_source')->first();
+      // The redirect module stores the source in the path property; fall
+      // back to value for simple string fields.
+      $value = $item ? $item->getValue() : [];
+      $source_path = $value['path'] ?? $value['value'] ?? NULL;
+      if ($source_path) {
+        try {
+          $url = Url::fromUserInput('/' . ltrim($source_path, '/'));
+        }
+        catch (\InvalidArgumentException $exception) {
+          // Keep the canonical URL when the source path is invalid.
+        }
+      }
+    }
+
     return new static($entity, $action, $sites, $url);
   }
 
