@@ -10,11 +10,19 @@ interface PreviewOptions {
   }
 }
 
+/**
+ * @deprecated Use the corresponding DrupalClient class method instead.
+ * See https://next-drupal.org/docs/client
+ */
 export function DrupalPreview(options?: PreviewOptions) {
   return (request: NextApiRequest, response: NextApiResponse) =>
     PreviewHandler(request, response, options)
 }
 
+/**
+ * @deprecated Use the corresponding DrupalClient class method instead.
+ * See https://next-drupal.org/docs/client
+ */
 export async function PreviewHandler(
   request?: NextApiRequest,
   response?: NextApiResponse,
@@ -83,6 +91,10 @@ type GetResourcePreviewUrlOptions = JsonApiWithLocaleOptions & {
   isVersionable?: boolean
 }
 
+/**
+ * @deprecated Use the corresponding DrupalClient class method instead.
+ * See https://next-drupal.org/docs/client
+ */
 export async function getResourcePreviewUrl(
   slug: string,
   options?: GetResourcePreviewUrlOptions

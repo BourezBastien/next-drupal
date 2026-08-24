@@ -17,6 +17,10 @@ export function deserialize(
   return dataFormatter.deserialize(body, options)
 }
 
+/**
+ * @deprecated Use the corresponding DrupalClient class method instead.
+ * See https://next-drupal.org/docs/client
+ */
 export async function getJsonApiPathForResourceType(
   type: string,
   locale?: Locale
@@ -26,6 +30,10 @@ export async function getJsonApiPathForResourceType(
   return index?.links[type]?.href
 }
 
+/**
+ * @deprecated Use the corresponding DrupalClient class method instead.
+ * See https://next-drupal.org/docs/client
+ */
 export async function getJsonApiIndex(
   locale?: Locale,
   options?: {
@@ -128,6 +136,10 @@ export function getPathFromContext(
       : slug
 }
 
+/**
+ * @deprecated Use the corresponding DrupalClient class method instead.
+ * See https://next-drupal.org/docs/client
+ */
 export function syncDrupalPreviewRoutes(path: string) {
   if (window && window.top !== window.self) {
     window.parent.postMessage(

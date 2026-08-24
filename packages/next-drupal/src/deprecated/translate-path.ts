@@ -2,6 +2,10 @@ import { buildHeaders, buildUrl, getPathFromContext } from "./utils"
 import type { GetStaticPropsContext } from "next"
 import type { AccessToken, DrupalTranslatedPath } from "../types"
 
+/**
+ * @deprecated Use the corresponding DrupalClient class method instead.
+ * See https://next-drupal.org/docs/client
+ */
 export async function translatePath(
   path: string,
   options?: {
@@ -25,6 +29,10 @@ export async function translatePath(
   return json
 }
 
+/**
+ * @deprecated Use the corresponding DrupalClient class method instead.
+ * See https://next-drupal.org/docs/client
+ */
 export async function translatePathFromContext(
   context: GetStaticPropsContext,
   options?: {

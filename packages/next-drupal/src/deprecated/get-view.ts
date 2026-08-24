@@ -2,6 +2,10 @@ import { buildHeaders, buildUrl, deserialize } from "./utils"
 import type { AccessToken } from "../types"
 import type { JsonApiWithLocaleOptions } from "../types/deprecated"
 
+/**
+ * @deprecated Use the corresponding DrupalClient class method instead.
+ * See https://next-drupal.org/docs/client
+ */
 export async function getView<T>(
   name: string,
   options?: {

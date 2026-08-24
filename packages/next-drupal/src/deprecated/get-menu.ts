@@ -2,6 +2,10 @@ import { buildHeaders, buildUrl, deserialize } from "./utils"
 import type { AccessToken, DrupalMenuItem } from "../types"
 import type { JsonApiWithLocaleOptions } from "../types/deprecated"
 
+/**
+ * @deprecated Use the corresponding DrupalClient class method instead.
+ * See https://next-drupal.org/docs/client
+ */
 export async function getMenu<T extends DrupalMenuItem>(
   name: string,
   options?: {

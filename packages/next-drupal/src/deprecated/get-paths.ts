@@ -8,6 +8,10 @@ import type {
   Locale,
 } from "../types"
 
+/**
+ * @deprecated Use the corresponding DrupalClient class method instead.
+ * See https://next-drupal.org/docs/client
+ */
 export async function getPathsFromContext(
   types: string | string[],
   context: GetStaticPathsContext,
