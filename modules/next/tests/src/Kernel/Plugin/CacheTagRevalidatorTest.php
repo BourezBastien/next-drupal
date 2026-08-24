@@ -134,14 +134,14 @@ class CacheTagRevalidatorTest extends KernelTestBase {
     $entity_type_config->save();
 
     // No revalidation happens while the site has no revalidate URL.
-    $page = $this->createNode();
+    $this->createNode();
     $this->container->get('kernel')->terminate(Request::create('/'), new Response());
     $this->assertEmpty($this->recordedUrls);
 
     // The revalidate URL receives the entity cache tags and the entity
     // locale.
     $blog_site->setRevalidateUrl('http://blog.com/api/revalidate')->save();
-    $page = $this->createNode();
+    $this->createNode();
     $this->container->get('kernel')->terminate(Request::create('/'), new Response());
 
     $this->assertCount(1, $this->recordedUrls);
@@ -159,7 +159,7 @@ class CacheTagRevalidatorTest extends KernelTestBase {
     ])->save();
     $blog_site->setRevalidateUrl('http://blog.com/api/revalidate')->setRevalidateSecret('12345')->save();
 
-    $page = $this->createNode();
+    $this->createNode();
     $this->container->get('kernel')->terminate(Request::create('/'), new Response());
 
     $this->assertCount(2, $this->recordedUrls);
