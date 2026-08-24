@@ -593,8 +593,10 @@ export class NextDrupalBase {
    *
    * @param {string} message The debug message.
    */
-  debug(message) {
-    this.isDebugEnabled && this.logger.debug(message)
+  debug(message: string | Error) {
+    if (this.isDebugEnabled) {
+      this.logger.debug(message)
+    }
   }
 
   /**

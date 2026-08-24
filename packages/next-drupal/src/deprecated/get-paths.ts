@@ -1,6 +1,12 @@
 import { getResourceCollection } from "./get-resource-collection"
 import type { GetStaticPathsContext, GetStaticPathsResult } from "next"
-import type { AccessToken, JsonApiParams, Locale } from "../types"
+import type {
+  AccessToken,
+  JsonApiParams,
+  JsonApiResource,
+  JsonApiResourceWithPath,
+  Locale,
+} from "../types"
 
 export async function getPathsFromContext(
   types: string | string[],
@@ -67,21 +73,29 @@ export async function getPathsFromContext(
   return paths.flat()
 }
 
-function buildPathsFromResources(resources, locale?: Locale) {
+function buildPathsFromResources(
+  resources: JsonApiResource[],
+  locale?: Locale
+) {
   return resources?.flatMap((resource) => {
+    // The resources are fetched with their path field.
+    const resourcePath = (resource as JsonApiResourceWithPath).path
     const slug =
-      resource?.path?.alias === process.env.DRUPAL_FRONT_PAGE
+      resourcePath?.alias === process.env.DRUPAL_FRONT_PAGE
         ? "/"
-        : resource?.path?.alias
+        : resourcePath?.alias
 
-    const path = {
+    const path: {
+      params: { slug: string[] }
+      locale?: Locale
+    } = {
       params: {
         slug: `${slug?.replace(/^\/|\/$/g, "")}`.split("/"),
       },
     }
 
     if (locale) {
-      path["locale"] = locale
+      path.locale = locale
     }
 
     return path

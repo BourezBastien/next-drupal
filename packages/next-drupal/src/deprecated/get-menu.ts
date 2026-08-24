@@ -36,18 +36,18 @@ export async function getMenu<T extends DrupalMenuItem>(
 
   const items = options.deserialize ? deserialize(data) : data
 
-  const { items: tree } = buildMenuTree(items)
+  const { items: tree } = buildMenuTree(items as DrupalMenuItem[])
 
   return {
     items,
-    tree,
+    tree: (tree ?? []) as T[],
   }
 }
 
 function buildMenuTree(
   links: DrupalMenuItem[],
   parent: DrupalMenuItem["id"] = ""
-) {
+): { items?: DrupalMenuItem[] } {
   if (!links?.length) {
     return {
       items: [],

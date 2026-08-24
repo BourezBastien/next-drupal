@@ -10,7 +10,8 @@ interface PreviewOptions {
 }
 
 export function DrupalPreview(options?: PreviewOptions) {
-  return (request, response) => PreviewHandler(request, response, options)
+  return (request: NextApiRequest, response: NextApiResponse) =>
+    PreviewHandler(request, response, options)
 }
 
 export async function PreviewHandler(
