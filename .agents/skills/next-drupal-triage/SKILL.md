@@ -138,7 +138,11 @@ mergeable ones likely obsolete: #67, #306, #425, #446, #491.
 #491 (install profile: duplicate of #474, fixed by the jsonapi_hypermedia addition),
 #493 (preview secret expired: duplicate of #422, covered by the known-issues entry),
 #495 (edit forms no longer hijacked by the preview: the HtmlRenderer only takes canonical and revision routes, with the early return for empty sites from upstream PR #481 — verified in code),
-#513 (multi-domain previewing: deferred — one preview_url per NextSite by design; per-domain or per-locale preview URLs need a design pass).
+#513 (multi-domain previewing: deferred — one preview_url per NextSite by design; per-domain or per-locale preview URLs need a design pass),
+#516 (entity tokens in additional paths: the Path revalidator now replaces tokens like [node:url:path] via the token service (injected into RevalidatorBase, optional for BC), and the form description documents it — kernel-tested with [node:nid]),
+#525 (422 preview debugging: the preview handler propagates Drupal errors with DRUPAL_DEBUG logging since the #818 fix; the "Method Not Allowed on /next/preview-url" from the issue is a GET-vs-POST misconfiguration),
+#519 (basic pages: configure the node.page entity type at /admin/config/services/next/entity-types — question answered by configuration, reporter never followed up),
+#523 (umami clone 404: no reply; covered by the FAQ checklist (#448) and the alias guidance (#469) — needs-repro).
 
 Already resolved by adopted/other work (no further action): #148 (preview alerts already use a plain <a>, fix from the issue thread applied upstream), #740 (flaky coverage — Node bug mitigated by the .nvmrc v18.19 pin, referenced in .nvmrc), #838 (v1.6 menu link already correct), #581 (ESM + sideEffects:false already shipped), #746 (fixed by adopted PR #747),
 #589 (permission list incl. View all revisions already in the draft-mode guide),
