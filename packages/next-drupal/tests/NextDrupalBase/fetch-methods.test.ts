@@ -59,6 +59,29 @@ describe("fetch()", () => {
     )
   })
 
+  test("omits credentials when the runtime does not support them", async () => {
+    const drupal = new NextDrupalBase(BASE_URL)
+    const fetchSpy = spyOnFetch({ responseBody: {} })
+
+    // Simulate a runtime without Request.credentials (e.g. Cloudflare
+    // Workers), restoring the property afterwards.
+    const descriptor = Object.getOwnPropertyDescriptor(
+      Request.prototype,
+      "credentials"
+    )
+    delete (Request.prototype as Record<string, unknown>).credentials
+    try {
+      await drupal.fetch(mockUrl)
+    } finally {
+      if (descriptor) {
+        Object.defineProperty(Request.prototype, "credentials", descriptor)
+      }
+    }
+
+    const init = fetchSpy.mock.calls[0][1]
+    expect(init).not.toHaveProperty("credentials")
+  })
+
   test("allows for custom fetcher", async () => {
     const logger = mockLogger()
     const customFetch = jest.fn()

@@ -203,7 +203,12 @@ export class NextDrupalBase {
     input: RequestInfo,
     { withAuth, ...init }: FetchOptions = {}
   ): Promise<Response> {
-    init.credentials = "include"
+    // Some runtimes (e.g. Cloudflare Workers) do not implement the
+    // credentials property and break when it is set. Only set it when the
+    // runtime supports it.
+    if (typeof Request !== "undefined" && "credentials" in Request.prototype) {
+      init.credentials = "include"
+    }
 
     // Merge the init.headers with this.headers
     const headers = new Headers(this.headers)
