@@ -1,7 +1,22 @@
 ---
 title: Draft Mode
-excerpt: Using draft mode with NextDrupal client.
+excerpt: Using draft mode with next-drupal. In the App Router, draft mode replaces the preview mode from version 1.
 ---
+
+In `next-drupal` 2.0, the **App Router** uses [Next.js Draft Mode](https://nextjs.org/docs/app/building-your-application/configuring/draft-mode) to preview unpublished content and revisions. Draft mode replaces the preview mode known from version 1 — `DrupalPreview`, `pages/api/preview.ts` and `drupal.preview()` no longer apply to the App Router. The Pages Router continues to use `drupal.preview()` as before.
+
+The draft mode helpers live in the `next-drupal/draft` entry point and are considered experimental.
+
+## Migration from preview mode (version 1)
+
+| Preview mode (v1, Pages Router)                              | Draft mode (v2, App Router)                              |
+| ------------------------------------------------------------ | -------------------------------------------------------- |
+| `pages/api/preview.ts` with `DrupalPreview`                  | `app/api/draft/route.ts` with `enableDraftMode`          |
+| `pages/api/exit-preview.ts` calling `res.clearPreviewData()` | `app/api/disable-draft/route.ts` with `disableDraftMode` |
+| `drupal.preview(request, response)`                          | `enableDraftMode(request, drupal)`                       |
+| Preview data read from cookies manually                      | `getDraftData()` returns `{ path, resourceVersion }`     |
+
+## Setup
 
 To implement draft mode, configure entity types on Drupal. See the guide [here](/learn/draft-mode).
 
@@ -27,3 +42,54 @@ export async function GET(request: NextRequest) {
   return disableDraftMode()
 }
 ```
+
+## Reading draft data in a page
+
+When draft mode is enabled, `getDraftData()` returns the path being previewed and
+the `resourceVersion` of the revision to display. Use them to fetch the correct
+revision of the resource:
+
+```tsx title=app/[...slug]/page.tsx
+import { getDraftData } from "next-drupal/draft"
+import { drupal } from "@/lib/drupal"
+import type { DrupalNode, JsonApiParams } from "next-drupal"
+
+export default async function Page({ params }) {
+  const path = `/${params.slug.join("/")}`
+
+  const requestParams: JsonApiParams = {}
+
+  // Fetch the revision being previewed when draft mode is enabled for
+  // this path. Outside of draft mode getDraftData() returns an empty
+  // object and the published revision is fetched as usual.
+  const draftData = await getDraftData()
+  if (draftData.path === path) {
+    requestParams.resourceVersion = draftData.resourceVersion
+  }
+
+  const translatedPath = await drupal.translatePath(path)
+  if (!translatedPath) {
+    notFound()
+  }
+
+  const node = await drupal.getResource<DrupalNode>(
+    translatedPath.jsonapi?.resourceName!,
+    translatedPath.entity.uuid,
+    { params: requestParams }
+  )
+
+  // ...
+}
+```
+
+`getDraftData()` is safe to call during static generation: when draft mode is
+disabled it returns an empty object without touching request APIs such as
+`cookies()`, so statically generated pages stay static.
+
+## Notes
+
+- Draft mode requires the Drupal `next` module to be configured for the entity
+  type, with a [site previewer](/docs/site-previewer) pointing at your Next.js
+  site.
+- The `resourceVersion` value is the JSON:API version identifier of the
+  revision (for example `id:3`).
