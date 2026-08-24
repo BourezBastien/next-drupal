@@ -4,6 +4,8 @@ namespace Drupal\next;
 
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Link;
+use Drupal\Core\Url;
 
 /**
  * Defines a class to build a listing of next_site entities.
@@ -31,7 +33,18 @@ class NextSiteListBuilder extends ConfigEntityListBuilder {
     $row['uuid'] = $entity->uuid();
     $row['id'] = $entity->id();
     $row['label'] = $entity->label();
-    $row['base_url'] = $entity->getBaseUrl();
+
+    $base_url = $entity->getBaseUrl();
+    if ($base_url && filter_var($base_url, FILTER_VALIDATE_URL)) {
+      $row['base_url'] = Link::fromTextAndUrl($base_url, Url::fromUri($base_url, [
+        'attributes' => ['target' => '_blank'],
+      ]));
+    }
+    else {
+      // Keep the raw value when it is not a valid URL so site builders can
+      // still spot and fix misconfigured sites.
+      $row['base_url'] = $base_url ?: $this->t('N/A');
+    }
 
     return $row + parent::buildRow($entity);
   }
