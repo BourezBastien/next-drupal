@@ -312,6 +312,13 @@ export class NextDrupalBase {
    * ```
    */
   buildUrl(path: string, searchParams?: EndpointSearchParams): URL {
+    // Preserve the base URL path when Drupal is installed in a subdirectory,
+    // so root-absolute paths resolve under it instead of the domain root.
+    const basePath = new URL(this.baseUrl).pathname.replace(/\/+$/, "")
+    if (path.startsWith("/") && basePath !== "") {
+      path = `${basePath}${path}`
+    }
+
     const url = new URL(path, this.baseUrl)
 
     const search =
