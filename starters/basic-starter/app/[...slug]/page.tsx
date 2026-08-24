@@ -22,7 +22,10 @@ async function getNode(slug: string[]) {
   const translatedPath = await drupal.translatePath(path)
 
   if (!translatedPath) {
-    throw new Error("Resource not found", { cause: "NotFound" })
+    // Use notFound() instead of throwing: throwing breaks on-demand
+    // revalidation of unpublished pages with a 500, while notFound() lets
+    // the revalidation succeed and serve a 404.
+    notFound()
   }
 
   const type = translatedPath.jsonapi?.resourceName!
