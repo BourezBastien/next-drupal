@@ -126,7 +126,12 @@ mergeable ones likely obsolete: #67, #306, #425, #446, #491.
 #162 (media by path requires the /media/{id} access setting — callout added to getResourceByPath docs),
 #277 (Umami guide: Node 18 LTS+ requirement added — non-LTS Node releases fail the next-auth engine check),
 #354 (patches still required: contrib bugs unfixed upstream; docs reference the current 2024 re-rolled decoupled_router patch),
-#433 (translatePath now resolves paths per language: the Decoupled Router endpoint is prefixed with the locale via addLocalePrefix, and translatePathFromContext forwards the context locale — jest-tested).
+#433 (translatePath now resolves paths per language: the Decoupled Router endpoint is prefixed with the locale via addLocalePrefix, and translatePathFromContext forwards the context locale — jest-tested),
+#466 (getResourceFromContext no longer mutates the caller's context.locale — the entity langcode drives the path lookup through a copy; jest-tested with a de-de/de negotiation mismatch),
+#465 (SEO guide added: Metatag via JSON:API, sitemap wiring through robots.ts, GTM with next/script, redirects pointer),
+#447 (demo credentials documented in the FAQ: demo.next-drupal.org with example/example),
+#448 (JSON:API index fetch failure: troubleshooting checklist in the FAQ — server-side reachability, subdirectory base URL, local https),
+#452 (link field aliases: jsonapi_extras URL enhancer or the core computed-URL patch — FAQ entry).
 
 Already resolved by adopted/other work (no further action): #148 (preview alerts already use a plain <a>, fix from the issue thread applied upstream), #740 (flaky coverage — Node bug mitigated by the .nvmrc v18.19 pin, referenced in .nvmrc), #838 (v1.6 menu link already correct), #581 (ESM + sideEffects:false already shipped), #746 (fixed by adopted PR #747),
 #589 (permission list incl. View all revisions already in the draft-mode guide),

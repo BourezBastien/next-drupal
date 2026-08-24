@@ -1,0 +1,72 @@
+---
+title: SEO
+excerpt: Metatags, sitemaps and analytics from Drupal in a Next.js site.
+---
+
+SEO data lives in Drupal and is consumed by the Next.js site at render time. This guide covers the common pieces: metatags, XML sitemaps and analytics.
+
+## Metatags
+
+1. Install [Metatag](https://www.drupal.org/project/metatag) on the Drupal side and configure the defaults per content type at `/admin/config/search/metatag`.
+2. Expose the computed `metatag` field to JSON:API — the [normalizer patch](https://drupal.org/node/2945817) or [jsonapi_extras](https://www.drupal.org/project/jsonapi_extras) field configuration both work.
+3. Request the field and map it to Next.js metadata:
+
+```tsx title=app/blog/[slug]/page.tsx
+import type { Metadata } from "next"
+
+export async function generateMetadata({ params }): Promise<Metadata> {
+  const node = await drupal.getResource<DrupalNode>(
+    "node--article",
+    params.uuid,
+    {
+      params: {
+        "fields[node--article]": "title,metatag",
+      },
+    }
+  )
+
+  const metatags = Object.fromEntries(
+    (node.metatag ?? []).map((tag) => [tag.name, tag.content])
+  )
+
+  return {
+    title: metatags.title,
+    description: metatags.description,
+    openGraph: {
+      title: metatags["og:title"],
+      description: metatags["og:description"],
+    },
+  }
+}
+```
+
+## XML sitemap
+
+Serve the sitemap from Drupal with [Simple XML Sitemap](https://www.drupal.org/project/simple_sitemap) and either proxy it through a Next.js route handler or link it directly from `app/robots.ts`:
+
+```ts title=app/robots.ts
+export default function robots() {
+  return {
+    rules: { userAgent: "*", allow: "/" },
+    sitemap: `${process.env.NEXT_PUBLIC_DRUPAL_BASE_URL}/sitemap.xml`,
+  }
+}
+```
+
+## Analytics (GA, GTM)
+
+Keep the analytics configuration in Drupal (a site setting or a block) and inject the script on the Next.js side with [next/script](https://nextjs.org/docs/app/building-your-application/optimizing/scripts):
+
+```tsx title=app/layout.tsx
+import Script from "next/script"
+
+// GTM_ID comes from Drupal (site settings, exposed through an API) or an
+// environment variable.
+;<Script id="gtm" strategy="afterInteractive">
+  {`(function(w,d,s,l,i){...})(window,document,'script','dataLayer','${gtmId}');`}
+</Script>
+```
+
+## Redirects
+
+Keep HTTP redirects in Drupal with the [Redirect](https://www.drupal.org/project/redirect) module — the frontend then follows them through the path translation offered by the [client](/docs/client). See the [Redirects guide](/guides/redirects) for the Next.js router integration.

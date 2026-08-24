@@ -25,6 +25,22 @@ Yes. Since 2.0 the core client (`NextDrupal`, `NextDrupalPages`, `NextDrupalBase
 
 Yes. Keep the two applications in separate containers: Drupal in a PHP container (ddev, docker4drupal or a custom image) and the Next.js app in a Node container pointing `NEXT_PUBLIC_DRUPAL_BASE_URL` at the Drupal service. The [Quick start](/tutorials/quick-start) covers a ddev-based Drupal setup, and any Node image works for the frontend (`node:20` with `npm run build && npm run start`).
 
+## Where can I try the authentication flow?
+
+The hosted demo at [demo.next-drupal.org](https://demo.next-drupal.org) has authentication enabled — sign in with the username `example` and the password `example`.
+
+## Error: Failed to fetch JSON:API index
+
+The Next.js server could not reach your Drupal backend. Check, in order:
+
+1. **The URL must be reachable from the Next.js server, not just your browser.** Inside Docker or ddev, `localhost` refers to the container itself — use the service name or the ddev hostname.
+2. **Include the subdirectory when Drupal is installed in one** (e.g. `http://localhost:8080/drupal/web`). The client preserves the base URL path for subdirectory installs.
+3. **Prefer `http://` for local https setups** (ddev, self-signed certificates) unless the Node process trusts the certificate.
+
+## How do I get the URL or alias from a link field?
+
+Link fields serialize as URIs (`entity:node/42`, `https://…`). To resolve them to aliases, install [jsonapi_extras](https://www.drupal.org/project/jsonapi_extras) and set the **URL** enhancer on the link field, or use the [core patch adding a computed URL](https://www.drupal.org/project/drupal/issues/3066751).
+
 ## Something is not working. Help?
 
 You can get help in the [issue queue](https://github.com/chapter-three/next-drupal/issues) on GitHub or in the #nextjs channel on [Drupal Slack](https://drupal.slack.com/archives/C01E36BMU72).
