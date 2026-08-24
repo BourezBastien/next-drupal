@@ -16,7 +16,7 @@ export function useMenu<T extends DrupalMenuItem>(
     items: T[]
     tree: T[]
   } | null>(null)
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<unknown>(null)
   const [isLoading, setIsLoading] = useState<boolean>(false)
 
   useEffect(() => {

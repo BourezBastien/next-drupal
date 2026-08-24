@@ -1,8 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "noImplicitAny": true,
-    "strictNullChecks": true
+    "strict": true
   },
   "include": ["src/**/*.ts", "node_modules/next/types/*.d.ts"]
 }
