@@ -93,7 +93,7 @@ mergeable ones likely obsolete: #67, #306, #425, #446, #491.
   token (build workers + runtime instances). Expected behavior; a shared token
   cache would be an opt-in feature, not a bug fix.
 
-## Resolved on the fork (status as of session 15)
+## Resolved on the fork (status as of session 16)
 
 #854, #499, #874, #912, #861, #855, #859, #847, #911, #862, #848, #850, #686, #799, #681, #772, #722, #779, #155, #346, #650, #793, #813, #818, #246, #533, #783 (docs ddev/consommateur), #806 (numérotation umami + patches déjà corrigés), #611 (pattern next-auth preview), #653 (base_url rendered as a link in the next_site listing, kernel-tested), #696 (Path revalidator logs non-200 responses as warnings, kernel-tested), #615 (consumer collection path resolved via Url::fromRoute with a safe fallback, kernel-tested), #532 + #535 (version added to modules/next/package.json — no more yarn workspace warning; the workspace package is renamed next-drupal-module because the original "next" name shadowed the Next.js framework once versioned), #422 + #493 (preview secret expiration documented in known-issues.mdx: refresh the preview or raise secret_expiration),
 #325 (translatePath now sends Accept: application/json — the decoupled_router route requires the json format and older Drupal versions fail to negotiate application/vnd.api+json to it; jest-tested),
@@ -112,7 +112,9 @@ mergeable ones likely obsolete: #67, #306, #425, #446, #491.
 #453 (DRUPAL_PREVIEW_SECRET deprecated in 2.0 and fully removed from docs, starters, examples and e2e — the secret lives on the Drupal side and is signed into the preview URL),
 #485 (revisions/draft preview: resourceVersion is preserved end-to-end in 2.x — PreviewHandler stores it in previewData, getResourceFromContext falls back to it before rel:latest-version, draft.ts carries it; verified in preview.ts, next-drupal-pages.ts and draft.ts),
 #415 (require_login guide added: module setup plus the exact path exclusions the frontend and next module need — /jsonapi*, /router/translate-path, /next/preview-url, /oauth/*, /subrequests/*),
-#436 (Vercel Deployment Protection blocks the preview iframe with X-Frame-Options: deny — options documented in known-issues.mdx).
+#436 (Vercel Deployment Protection blocks the preview iframe with X-Frame-Options: deny — options documented in known-issues.mdx),
+#521 (site resolver is already independent of draft mode in 2.x — the form select sits at the top level with no #states; its description only mentioned draft validation, now clarified to cover on-demand revalidation too),
+#297 (revalidating other routes only: uncheck Revalidate page and fill Additional paths — existing configuration, documented in revalidator.mdx).
 
 Already resolved by adopted/other work (no further action): #148 (preview alerts already use a plain <a>, fix from the issue thread applied upstream), #740 (flaky coverage — Node bug mitigated by the .nvmrc v18.19 pin, referenced in .nvmrc), #838 (v1.6 menu link already correct), #581 (ESM + sideEffects:false already shipped), #746 (fixed by adopted PR #747),
 #589 (permission list incl. View all revisions already in the draft-mode guide),
@@ -154,7 +156,13 @@ access token server-side (simple_oauth introspection or a middleware check)
 rather than trusting the session cookie; no library change needed),
 #427 (hydration mismatch from dates: formatting dates inside client
 components is the mésusage — format on the server or render the same string
-on both sides; the umami example formats in server components only).
+on both sides; the umami example formats in server components only),
+#256 (static paths in Drupal: deferred product enhancement — the workaround
+pattern is a proxy node resolving to the same URL, as used by the maintainer;
+needs a design decision),
+#445 (queue for EntityEvents: deferred — the dispatcher already runs on
+shutdown and its queue is drained after dispatch; a real queue worker is an
+architectural project tied to multi-site benchmarks).
 Adopted upstream PRs: #865, #790, #791, #842, #904, #853, #844, #876, #856
 (adapted as `host` option), #860 (#846 was already fixed upstream by #887).
 
