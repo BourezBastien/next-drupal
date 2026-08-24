@@ -8,3 +8,4 @@ dependencies:
   - drupal:path
   - drupal:media
   - drupal:menu_ui
+  - drupal:taxonomy

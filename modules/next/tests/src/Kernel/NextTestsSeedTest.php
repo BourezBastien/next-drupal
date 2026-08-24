@@ -77,6 +77,21 @@ class NextTestsSeedTest extends KernelTestBase {
       'title' => 'Next tests home link',
     ]);
     $this->assertCount(1, $links);
+
+    // The seeded article carries the deterministic tag. (Its image is only
+    // attached when the image media type exists, i.e. on a standard site.)
+    $articles = $storage->loadByProperties([
+      'type' => 'next_test_article',
+      'title' => 'Next tests article',
+    ]);
+    $this->assertCount(1, $articles);
+    $article = reset($articles);
+    $this->assertSame('/next-tests/article', $this->getAlias($article));
+
+    $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties([
+      'name' => 'Next tests tag',
+    ]);
+    $this->assertCount(1, $terms);
   }
 
   /**
