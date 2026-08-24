@@ -180,6 +180,20 @@ describe("getDraftData()", () => {
     expect(data).toMatchObject({})
   })
 
+  test("does not access the cookie store when draft mode disabled", async () => {
+    const draft = await draftMode()
+    draft.disable()
+    cookies.mockClear()
+    draftMode.mockClear()
+
+    await getDraftData()
+
+    // Accessing cookies() would opt statically generated pages into dynamic
+    // rendering, so it must not be called when draft mode is disabled.
+    expect(cookies).toHaveBeenCalledTimes(0)
+    expect(draftMode).toHaveBeenCalledTimes(1)
+  })
+
   test("returns empty object if no draft data cookie", async () => {
     let draft = await draftMode()
     const cookieStore = await cookies()
