@@ -2,6 +2,8 @@
 
 namespace Drupal\Tests\next\Kernel\Plugin;
 
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\next\Entity\NextEntityTypeConfig;
 use Drupal\next\Entity\NextSite;
@@ -29,6 +31,7 @@ class PathRevalidatorTest extends KernelTestBase {
    * {@inheritdoc}
    */
   protected static $modules = [
+    'field',
     'filter',
     'next',
     'node',
@@ -125,6 +128,58 @@ class PathRevalidatorTest extends KernelTestBase {
     $client->request('GET', 'http://blog.com/api/revalidate?path=/blog')->shouldBeCalled()->willReturn(new GuzzleResponse());
     $page = $this->createNode();
     $page->save();
+    $this->container->get('kernel')->terminate(Request::create('/'), new Response());
+  }
+
+  /**
+   * @covers ::revalidate
+   */
+  public function testRevalidateRedirectSource() {
+    /** @var \GuzzleHttp\ClientInterface $client */
+    $client = $this->prophesize(ClientInterface::class);
+    $this->container->set('http_client', $client->reveal());
+
+    // Give nodes a redirect_source field, mimicking redirect entities so we
+    // can verify the redirect source path is revalidated instead of the
+    // entity's own path.
+    FieldStorageConfig::create([
+      'field_name' => 'redirect_source',
+      'entity_type' => 'node',
+      'type' => 'string',
+    ])->save();
+    FieldConfig::create([
+      'field_name' => 'redirect_source',
+      'entity_type' => 'node',
+      'bundle' => 'page',
+    ])->save();
+
+    NextSite::create([
+      'id' => 'blog',
+      'revalidate_url' => 'http://blog.com/api/revalidate',
+    ])->save();
+
+    NextEntityTypeConfig::create([
+      'id' => 'node.page',
+      'draft_enabled' => TRUE,
+      'site_resolver' => 'site_selector',
+      'configuration' => [
+        'sites' => [
+          'blog' => 'blog',
+        ],
+      ],
+      'revalidator' => 'path',
+      'revalidator_configuration' => [
+        'revalidate_page' => TRUE,
+      ],
+    ])->save();
+
+    $client->request('GET', 'http://blog.com/api/revalidate?path=/old-blog')->shouldBeCalled()->willReturn(new GuzzleResponse());
+
+    $page = $this->createNode([
+      'type' => 'page',
+      'title' => 'Redirect',
+      'redirect_source' => 'old-blog',
+    ]);
     $this->container->get('kernel')->terminate(Request::create('/'), new Response());
   }
 
