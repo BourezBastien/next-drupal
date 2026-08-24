@@ -1,5 +1,6 @@
 import { Jsona } from "jsona"
 import { DRAFT_DATA_COOKIE_NAME } from "./draft-constants"
+import type { JsonApiLinks } from "./jsonapi-errors"
 import { DrupalMenuTree } from "./menu-tree"
 import { NextDrupal } from "./next-drupal"
 import { isClientIdSecretAuth } from "./next-drupal-base"
@@ -12,6 +13,7 @@ import type {
   DrupalTranslatedPath,
   JsonApiOptions,
   JsonApiParams,
+  JsonApiResponse,
   JsonApiResource,
   JsonApiResourceWithPath,
   JsonApiWithAuthOption,
@@ -26,6 +28,24 @@ import type {
   NextApiRequest,
   NextApiResponse,
 } from "next"
+
+/**
+ * Extracts the href of the next pagination link from a JSON:API links object,
+ * if any. A link may be a plain string URL or an object with an href member.
+ *
+ * @param {JsonApiLinks | undefined} links The response links.
+ * @returns {string | null} The next page URL, or null when on the last page.
+ */
+function getPaginationHref(links?: JsonApiLinks): string | null {
+  const next = links?.["next"]
+  if (!next) {
+    return null
+  }
+  if (typeof next === "string") {
+    return next
+  }
+  return next.href ?? null
+}
 
 /**
  * The NextDrupalPages class extends the NextDrupal class and provides methods
@@ -472,7 +492,7 @@ export class NextDrupalPages extends NextDrupal {
 
         // Handle localized path aliases
         if (!context.locales?.length) {
-          const resources = await this.getResourceCollection<
+          const resources = await this.getPaginatedResourceCollection<
             JsonApiResourceWithPath[]
           >(type, {
             params,
@@ -486,7 +506,7 @@ export class NextDrupalPages extends NextDrupal {
 
         const paths = await Promise.all(
           context.locales.map(async (locale) => {
-            const resources = await this.getResourceCollection<
+            const resources = await this.getPaginatedResourceCollection<
               JsonApiResourceWithPath[]
             >(type, {
               deserialize: true,
@@ -508,6 +528,48 @@ export class NextDrupalPages extends NextDrupal {
     )
 
     return paths.flat()
+  }
+
+  /**
+   * Fetches every page of a resource collection by following the JSON:API
+   * pagination links, then deserializes the accumulated resources.
+   *
+   * Drupal caps the number of items returned per request, so callers that
+   * need the full collection (e.g. for static path generation) must walk
+   * the `links.next` pagination links until they are exhausted.
+   *
+   * @param {string} type The resource type.
+   * @param {Object} options Options forwarded to getResourceCollection.
+   * @returns {Promise<JsonApiResourceWithPath[]>} Every resource of the collection.
+   */
+  private async getPaginatedResourceCollection<T = JsonApiResourceWithPath[]>(
+    type: string,
+    options: JsonApiOptions
+  ): Promise<T> {
+    const firstPage = (await this.getResourceCollection(type, {
+      ...options,
+      // Keep the raw response so the pagination links are available.
+      deserialize: false,
+    })) as unknown as JsonApiResponse
+
+    const resources: JsonApiResource[] = [
+      ...((firstPage.data ?? []) as unknown as JsonApiResource[]),
+    ]
+
+    let next = getPaginationHref(firstPage.links)
+    while (next) {
+      const response = await this.fetch(next, {
+        withAuth: options.withAuth,
+      })
+      if (!response.ok) {
+        break
+      }
+      const page = (await response.json()) as JsonApiResponse
+      resources.push(...((page.data ?? []) as unknown as JsonApiResource[]))
+      next = getPaginationHref(page.links)
+    }
+
+    return this.deserialize({ data: resources }) as unknown as T
   }
 
   /**
