@@ -24,3 +24,17 @@ the **Secret expiration time** setting of the preview URL generator at
 `/admin/config/services/next`. Refresh the preview screen to request a new
 preview URL, or increase the expiration time if your editors regularly
 spend more than 30 seconds on the preview screen before navigating.
+
+## A republished page keeps returning 404
+
+Unpublishing a page correctly returns a 404, but publishing it again keeps
+serving the cached 404 until the Next.js server restarts.
+
+### Solution
+
+The module sends a revalidation when the entity is saved, and the starter
+returns `notFound()` instead of throwing on unpublished content, so the flow
+works on supported Next.js versions. Cached 404s, however, were not
+invalidated by `revalidatePath` in older Next.js releases — upgrade to
+Next.js 13.4 or later (Next 14/15 in the 2.x starters), where stale 404s are
+purged like any other page.
