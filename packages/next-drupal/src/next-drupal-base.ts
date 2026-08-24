@@ -598,6 +598,9 @@ export class NextDrupalBase {
 
     const response = await this.fetch(url.toString(), {
       method: "POST",
+      // Never let the fetch cache layer (e.g. Next.js 14 caching by
+      // default) serve a stale token response. (#788)
+      cache: "no-store",
       headers: {
         Authorization: await this.getAuthorizationHeader(clientCredentials),
         Accept: "application/json",

@@ -151,7 +151,12 @@ mergeable ones likely obsolete: #67, #306, #425, #446, #491.
 #732 (example-marketing build: domhandler root import fixed and images.domains falls back to an empty array — remaining deprecations belong to the examples modernization backlog),
 #699 (single sign-on question: FAQ entry explaining the sessions stay separate),
 #713 (dependabot tanstack bump: superseded by #714 — folded into the dev-dependencies modernization project),
-#727 (preview not visible: draft mode is opt-in per entity type — configuration, answered in the issue with screenshots).
+#727 (preview not visible: draft mode is opt-in per entity type — configuration, answered in the issue with screenshots),
+#788 (stale cached token: the token request now sends cache: "no-store" so the fetch layer (Next 14 cached by default) never serves a stale token — jest-asserted; Next 15 fixed the default),
+#753 (paginated term pages: answered in the issue — getStaticPaths lacks the context for pager paths; render server-side or client-side, and withMeta (#456) provides the pagination data),
+#754 (OAuth consumer access control: unchecking Bypass content access control is fine — node grants apply to the OAuth user's scopes; a Drupal-side access question, not a client issue),
+#769 (documentation proposal: largely addressed by the guides added on the fork — SEO, require-login, known-issues, FAQ entries; continuous improvement),
+#771 (return only necessary data: already supported via JSON:API sparse fieldsets and includes — documented in fetching-resources).
 
 Already resolved by adopted/other work (no further action): #148 (preview alerts already use a plain <a>, fix from the issue thread applied upstream), #740 (flaky coverage — Node bug mitigated by the .nvmrc v18.19 pin, referenced in .nvmrc), #838 (v1.6 menu link already correct), #581 (ESM + sideEffects:false already shipped), #746 (fixed by adopted PR #747),
 #589 (permission list incl. View all revisions already in the draft-mode guide),
