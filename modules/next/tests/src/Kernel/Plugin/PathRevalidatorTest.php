@@ -142,6 +142,46 @@ class PathRevalidatorTest extends KernelTestBase {
   /**
    * @covers ::revalidate
    */
+  public function testRevalidateSuspendsSiteAfterFailure() {
+    /** @var \GuzzleHttp\ClientInterface $client */
+    $client = $this->prophesize(ClientInterface::class);
+    $this->container->set('http_client', $client->reveal());
+
+    NextSite::create([
+      'id' => 'blog',
+      'revalidate_url' => 'http://blog.com/api/revalidate',
+    ])->save();
+
+    NextEntityTypeConfig::create([
+      'id' => 'node.page',
+      'site_resolver' => 'site_selector',
+      'configuration' => [
+        'sites' => [
+          'blog' => 'blog',
+        ],
+      ],
+      'revalidator' => 'path',
+      'revalidator_configuration' => [
+        'revalidate_page' => TRUE,
+        'additional_paths' => '/listing',
+      ],
+    ])->save();
+
+    // The first request to the site fails: further requests to the same
+    // site must be suspended instead of stacking timeouts. (#695)
+    $client->request('GET', 'http://blog.com/api/revalidate?path=/node/1')
+      ->shouldBeCalledTimes(1)
+      ->willThrow(new \Exception('Connection timed out.'));
+    $client->request('GET', 'http://blog.com/api/revalidate?path=/listing')
+      ->shouldNotBeCalled();
+
+    $this->createNode(['type' => 'page']);
+    $this->container->get('kernel')->terminate(Request::create('/'), new Response());
+  }
+
+  /**
+   * @covers ::revalidate
+   */
   public function testRevalidateTokensInAdditionalPaths() {
     /** @var \GuzzleHttp\ClientInterface $client */
     $client = $this->prophesize(ClientInterface::class);

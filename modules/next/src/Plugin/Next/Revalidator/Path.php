@@ -111,9 +111,18 @@ class Path extends ConfigurableRevalidatorBase implements RevalidatorInterface {
       return FALSE;
     }
 
+    // Sites whose revalidation requests failed are suspended for the rest
+    // of the run: with multiple paths, retrying an unreachable site for
+    // every path only stacks timeouts. (#695)
+    $suspended_sites = [];
+
     foreach ($paths as $path) {
       /** @var \Drupal\next\Entity\NextSite $site */
       foreach ($sites as $site) {
+        if (isset($suspended_sites[$site->id()])) {
+          continue;
+        }
+
         try {
           $revalidate_url = $site->buildRevalidateUrl(['path' => $path]);
 
@@ -157,6 +166,11 @@ class Path extends ConfigurableRevalidatorBase implements RevalidatorInterface {
         catch (\Exception $exception) {
           Error::logException($this->logger, $exception);
           $revalidated = FALSE;
+          $suspended_sites[$site->id()] = TRUE;
+          $this->logger->warning('(@action): Suspending further revalidations for the site %site after a failed request.', [
+            '@action' => $event->getAction(),
+            '%site' => $site->label(),
+          ]);
         }
       }
     }
