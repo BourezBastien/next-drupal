@@ -1625,6 +1625,20 @@ describe("translatePath()", () => {
     )
   })
 
+  test("negotiates the json format expected by decoupled_router", async () => {
+    const drupal = new NextDrupal(BASE_URL)
+
+    const fetchSpy = spyOnFetch({
+      status: 200,
+      responseBody: mocks.resources.translatePath.ok,
+    })
+
+    await drupal.translatePath("/recipes/deep-mediterranean-quiche")
+
+    const init = fetchSpy.mock.calls[0][1]
+    expect(init.headers.get("accept")).toBe("application/json")
+  })
+
   test("throws an error on server error", async () => {
     const drupal = new NextDrupal(BASE_URL)
 
