@@ -3,6 +3,10 @@ import { useEffect, useState } from "react"
 import { getMenu } from "./get-menu"
 import type { DrupalMenuItem } from "../types"
 
+/**
+ * @deprecated Use the corresponding DrupalClient class method instead.
+ * See https://next-drupal.org/docs/client
+ */
 export function useMenu<T extends DrupalMenuItem>(
   name: string
 ): {

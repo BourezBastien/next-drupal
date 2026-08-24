@@ -1830,4 +1830,57 @@ describe("createResource()", () => {
       "0e8a1d91-7b67-4143-9a47-c849775cb9f9"
     )
   })
+
+  test("forwards the next option to the fetch call", async () => {
+    const drupal = new NextDrupal(BASE_URL)
+
+    const fetchSpy = spyOnFetch({
+      status: 200,
+      responseBody: {
+        data: {
+          type: "node--article",
+          id: "3330a418-51db-4b52-8a10-1f04df8e67d9",
+          attributes: { title: "TEST New article" },
+        },
+      },
+    })
+
+    await drupal.createResource(
+      "node--article",
+      {
+        data: {
+          attributes: { title: "TEST New article" },
+        },
+      },
+      {
+        deserialize: false,
+        withAuth: false,
+        next: { revalidate: 60 },
+      }
+    )
+
+    const init = fetchSpy.mock.calls[0][1]
+    expect(init.next).toEqual({ revalidate: 60 })
+  })
+})
+
+describe("getIndex()", () => {
+  test("authenticates when withAuth is passed", async () => {
+    const drupal = new NextDrupal(BASE_URL, {
+      auth: {
+        access_token: "an-access-token",
+        token_type: "Bearer",
+      } as never,
+    })
+
+    const fetchSpy = spyOnFetch({
+      status: 200,
+      responseBody: { data: [], links: {}, jsonapi: { version: "1.0" } },
+    })
+
+    await drupal.getIndex("en", { withAuth: true })
+
+    const init = fetchSpy.mock.calls[0][1]
+    expect(init.headers.get("authorization")).toBe("Bearer an-access-token")
+  })
 })

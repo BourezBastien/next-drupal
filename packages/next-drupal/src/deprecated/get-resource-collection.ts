@@ -8,6 +8,10 @@ import type { GetStaticPropsContext } from "next"
 import type { AccessToken, JsonApiParams, JsonApiResource } from "../types"
 import type { JsonApiWithLocaleOptions } from "../types/deprecated"
 
+/**
+ * @deprecated Use the corresponding DrupalClient class method instead.
+ * See https://next-drupal.org/docs/client
+ */
 export async function getResourceCollection<T = JsonApiResource[]>(
   type: string,
   options?: {
@@ -46,6 +50,10 @@ export async function getResourceCollection<T = JsonApiResource[]>(
   return options.deserialize ? deserialize(json) : json
 }
 
+/**
+ * @deprecated Use the corresponding DrupalClient class method instead.
+ * See https://next-drupal.org/docs/client
+ */
 export async function getResourceCollectionFromContext<T = JsonApiResource[]>(
   type: string,
   context: GetStaticPropsContext,

@@ -3,6 +3,10 @@ import type { GetStaticPropsContext } from "next"
 import type { AccessToken, JsonApiResource } from "../types"
 import type { JsonApiWithLocaleOptions } from "../types/deprecated"
 
+/**
+ * @deprecated Use the corresponding DrupalClient class method instead.
+ * See https://next-drupal.org/docs/client
+ */
 export async function getSearchIndex<T = JsonApiResource[]>(
   name: string,
   options?: {
@@ -35,6 +39,10 @@ export async function getSearchIndex<T = JsonApiResource[]>(
   return options.deserialize ? deserialize(json) : json
 }
 
+/**
+ * @deprecated Use the corresponding DrupalClient class method instead.
+ * See https://next-drupal.org/docs/client
+ */
 export async function getSearchIndexFromContext<T = JsonApiResource[]>(
   name: string,
   context: GetStaticPropsContext,

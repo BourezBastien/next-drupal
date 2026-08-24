@@ -10,6 +10,10 @@ import type { GetStaticPropsContext } from "next"
 import type { AccessToken, JsonApiParams, JsonApiResource } from "../types"
 import type { JsonApiWithLocaleOptions } from "../types/deprecated"
 
+/**
+ * @deprecated Use the corresponding DrupalClient class method instead.
+ * See https://next-drupal.org/docs/client
+ */
 export async function getResourceFromContext<T extends JsonApiResource>(
   type: string,
   context: GetStaticPropsContext,
@@ -65,6 +69,10 @@ export async function getResourceFromContext<T extends JsonApiResource>(
   return resource
 }
 
+/**
+ * @deprecated Use the corresponding DrupalClient class method instead.
+ * See https://next-drupal.org/docs/client
+ */
 export async function getResourceByPath<T extends JsonApiResource>(
   path: string,
   options?: {
@@ -164,6 +172,10 @@ export async function getResourceByPath<T extends JsonApiResource>(
   return options.deserialize ? deserialize(data) : data
 }
 
+/**
+ * @deprecated Use the corresponding DrupalClient class method instead.
+ * See https://next-drupal.org/docs/client
+ */
 export async function getResource<T extends JsonApiResource>(
   type: string,
   uuid: string,
