@@ -9,7 +9,7 @@ export interface DrupalBlock extends JsonApiResource {
 }
 
 export interface DrupalFile extends JsonApiResource {
-  drupal_internal__fid: string
+  drupal_internal__fid: number
   changed: string
   created: string
   filename: string
@@ -30,8 +30,8 @@ export interface DrupalFileMeta {
 }
 
 export interface DrupalMedia extends JsonApiResource {
-  drupal_internal__mid: string
-  drupal_internal__vid: string
+  drupal_internal__mid: number
+  drupal_internal__vid: number
   changed: string
   created: string
   name: string
@@ -104,7 +104,7 @@ export interface DrupalSearchApiFacet {
 }
 
 export interface DrupalTaxonomyTerm extends JsonApiResourceWithPath {
-  drupal_internal__tid: string
+  drupal_internal__tid: number
   changed: string
   default_langcode: boolean
   name: string
@@ -141,7 +141,7 @@ export interface DrupalTranslatedPath {
 }
 
 export interface DrupalUser extends JsonApiResourceWithPath {
-  drupal_internal__uid: string
+  drupal_internal__uid: number
   changed: string
   created: string
   default_langcode: boolean
