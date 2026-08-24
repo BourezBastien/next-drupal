@@ -55,7 +55,41 @@
       ],
       "rules": {
         "@typescript-eslint/explicit-module-boundary-types": "off",
-        "@typescript-eslint/no-unused-vars": ["warn", { "args": "none" }]
+        "@typescript-eslint/no-unused-vars": [
+          "warn",
+          {
+            "args": "none"
+          }
+        ]
+      }
+    },
+    {
+      "files": ["packages/next-drupal/src/**/*.ts"],
+      "rules": {
+        "@typescript-eslint/no-unused-vars": [
+          "error",
+          {
+            "args": "none"
+          }
+        ],
+        "import/no-cycle": "error"
+      },
+      "plugins": ["import"]
+    },
+    {
+      "files": ["packages/next-drupal/src/next-drupal-base.ts"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["next/*", "server-only"],
+                "message": "next-drupal-base must stay framework-agnostic."
+              }
+            ]
+          }
+        ]
       }
     }
   ]
