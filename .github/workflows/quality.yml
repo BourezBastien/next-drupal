@@ -31,7 +31,7 @@ jobs:
         run: |
           set +e
           yarn workspace next-drupal test --coverage=false > jest.log 2>&1
-          summary=$(grep -oE "Tests: [0-9]+ failed, [0-9]+ passed" jest.log | tail -1)
+          summary=$(grep -oE "Tests: +[0-9]+ failed, +[0-9]+ passed" jest.log | tail -1)
           echo "$summary"
           tail -20 jest.log
           passed=$(echo "$summary" | grep -oE "[0-9]+ passed" | grep -oE "[0-9]+")

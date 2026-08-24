@@ -98,7 +98,7 @@ class CacheTagRevalidatorTest extends KernelTestBase {
       /**
        * {@inheritdoc}
        */
-      public function getConfig(string $option = NULL) {
+      public function getConfig(?string $option = NULL) {
         return NULL;
       }
 
