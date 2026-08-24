@@ -30,6 +30,18 @@ const DEFAULT_HEADERS = {
   Accept: "application/json",
 }
 
+/** Structural match for DrupalJsonApiParams-like parameter builders. */
+type HasQueryObject = { getQueryObject: () => Record<string, unknown> }
+
+function hasQueryObject(value: unknown): value is HasQueryObject {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    "getQueryObject" in value &&
+    typeof value.getQueryObject === "function"
+  )
+}
+
 /**
  * The base class for NextDrupal clients.
  */
@@ -341,9 +353,7 @@ export class NextDrupalBase {
 
     const search =
       // Handle DrupalJsonApiParams objects.
-      searchParams &&
-      typeof searchParams === "object" &&
-      "getQueryObject" in searchParams
+      hasQueryObject(searchParams)
         ? searchParams.getQueryObject()
         : searchParams
 

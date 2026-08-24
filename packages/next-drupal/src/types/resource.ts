@@ -1,22 +1,21 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import type { JsonApiError, JsonApiLinks } from "../jsonapi-errors"
 import type { DrupalPathAlias } from "./drupal"
 
-// TODO: any...ugh.
-export interface JsonApiResponse extends Record<string, any> {
+// JSON:API payloads are open-ended: unknown keeps consumers honest while
+// preserving index access to server-controlled members.
+export interface JsonApiResponse extends Record<string, unknown> {
   jsonapi?: {
     version: string
-    meta: Record<string, any>[]
+    meta: Record<string, unknown>[]
   }
-  data: Record<string, any>[]
+  data: Record<string, unknown>[]
   errors: JsonApiError[]
   meta: {
     count: number
-    [key: string]: any
+    [key: string]: unknown
   }
   links?: JsonApiLinks
-  included?: Record<string, any>[]
+  included?: Record<string, unknown>[]
 }
 
 export interface JsonApiResourceBodyRelationship {
@@ -25,19 +24,19 @@ export interface JsonApiResourceBodyRelationship {
         type: string
         id: string
         // Relationship metadata, e.g. alt text for media image references.
-        meta?: Record<string, any>
+        meta?: Record<string, unknown>
       }
     | Array<{
         type: string
         id: string
-        meta?: Record<string, any>
+        meta?: Record<string, unknown>
       }>
 }
 
 export interface JsonApiCreateResourceBody {
   data: {
     type?: string
-    attributes?: Record<string, any>
+    attributes?: Record<string, unknown>
     relationships?: Record<string, JsonApiResourceBodyRelationship>
   }
 }
@@ -58,12 +57,12 @@ export interface JsonApiUpdateResourceBody {
   data: {
     type?: string
     id?: string
-    attributes?: Record<string, any>
+    attributes?: Record<string, unknown>
     relationships?: Record<string, JsonApiResourceBodyRelationship>
   }
 }
 
-export interface JsonApiResource extends Record<string, any> {
+export interface JsonApiResource extends Record<string, unknown> {
   id: string
   type: string
   langcode: string

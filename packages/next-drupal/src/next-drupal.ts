@@ -775,8 +775,11 @@ export class NextDrupal extends NextDrupalBase {
   ): Promise<DrupalResourceCollection<T>>
   async getResourceCollection<T = JsonApiResource[]>(
     type: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    options?: any
+    options?: {
+      deserialize?: boolean
+      withMeta?: boolean
+    } & JsonApiOptions &
+      JsonApiWithNextFetchOptions
   ): Promise<T | DrupalResourceCollection<T>> {
     options = {
       withAuth: this.withAuth,

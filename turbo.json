@@ -1,5 +1,16 @@
 {
   "$schema": "https://turborepo.org/schema.json",
+  "globalEnv": [
+    "DRUPAL_BASE_URL",
+    "DRUPAL_CLIENT_ID",
+    "DRUPAL_CLIENT_SECRET",
+    "DRUPAL_FRONT_PAGE",
+    "DRUPAL_JSONAPI_PREFIX",
+    "DRUPAL_SITE_ID",
+    "NEXT_PUBLIC_DRUPAL_BASE_URL",
+    "NEXT_PUBLIC_DRUPAL_SITE_ID",
+    "NEXT_PUBLIC_IMAGE_DOMAIN"
+  ],
   "pipeline": {
     "build": {
       "dependsOn": ["^build"],

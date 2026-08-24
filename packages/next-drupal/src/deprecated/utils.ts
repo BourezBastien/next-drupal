@@ -63,7 +63,7 @@ export async function getJsonApiIndex(
 
 export function buildUrl(
   path: string,
-  params?: string | Record<string, string> | URLSearchParams
+  params?: string | Record<string, unknown> | URLSearchParams
 ): URL {
   const url = new URL(
     path.charAt(0) === "/"
