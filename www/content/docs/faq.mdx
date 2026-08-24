@@ -17,6 +17,14 @@ Yes. Authentication is only required for previewing unpublished entities and rev
 
 You can use Next.js for Drupal for pulling public JSON:API data and building static pages without authentication.
 
+## Can I use the client with React Native?
+
+Yes. Since 2.0 the core client (`NextDrupal`, `NextDrupalPages`, `NextDrupalBase`) has no runtime dependency on Next.js — it is plain `fetch` and `qs`. Methods like `getResource`, `getResourceCollection`, `translatePath`, `getMenu` and `getView` work in any JavaScript runtime. Only the draft mode helpers (`next-drupal/draft`) and the `useMenu` hook (`next-drupal/navigation`) require a Next.js application.
+
+## Can I run Drupal and Next.js with Docker?
+
+Yes. Keep the two applications in separate containers: Drupal in a PHP container (ddev, docker4drupal or a custom image) and the Next.js app in a Node container pointing `NEXT_PUBLIC_DRUPAL_BASE_URL` at the Drupal service. The [Quick start](/tutorials/quick-start) covers a ddev-based Drupal setup, and any Node image works for the frontend (`node:20` with `npm run build && npm run start`).
+
 ## Something is not working. Help?
 
 You can get help in the [issue queue](https://github.com/chapter-three/next-drupal/issues) on GitHub or in the #nextjs channel on [Drupal Slack](https://drupal.slack.com/archives/C01E36BMU72).
