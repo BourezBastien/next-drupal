@@ -3,6 +3,7 @@ import { useTranslation } from "next-i18next"
 import Link from "next/link"
 
 import { MediaImage } from "components/media--image"
+import { nodeHref } from "lib/utils"
 
 interface NodeRecipeCardProps {
   node: DrupalNode
@@ -17,7 +18,7 @@ export function NodeRecipeCard({ node, ...props }: NodeRecipeCardProps) {
       {...props}
     >
       <h2 className="flex-1 font-serif text-[22px]">{node.title}</h2>
-      <Link href={node.path.alias} passHref>
+      <Link href={nodeHref(node)} passHref>
         <a className="inline-flex items-center uppercase hover:underline text-link">
           {t("view-recipe")}
           <svg

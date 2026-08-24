@@ -4,6 +4,7 @@ import { useTranslation } from "next-i18next"
 import classNames from "classnames"
 
 import { MediaImage } from "components/media--image"
+import { nodeHref } from "lib/utils"
 
 interface NodeArticleCardAltProps extends React.HTMLProps<HTMLElement> {
   node: DrupalNode
@@ -26,7 +27,7 @@ export function NodeArticleCardAlt({
     >
       <div className="flex flex-col flex-1 space-y-4">
         <h2 className="flex-1 font-serif text-2xl">{node.title}</h2>
-        <Link href={node.path.alias} passHref>
+        <Link href={nodeHref(node)} passHref>
           <a className="inline-flex items-center uppercase hover:underline text-link">
             {t("view-article")}
             <svg

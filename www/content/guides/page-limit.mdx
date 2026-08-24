@@ -19,10 +19,21 @@ Tip: If you have a site with a large number of pages, consider using on-demand g
 
 To override the page max size, set the following `parameter` in your Drupal `services.yml` file and clear caches.
 
+The file lives at `sites/default/services.yml` in your Drupal project. If it does not exist yet — a fresh Drupal installation only ships `sites/default/default.services.yml` — copy that template and remove the leading `default.` prefix:
+
+```sh
+cp sites/default/default.services.yml sites/default/services.yml
+```
+
+Then add the parameter to the copied file:
+
 ```yaml
 parameters:
-  next_jsonapi.size_max: 100 // Set your max limit here.
+  # Set your max limit here.
+  next_jsonapi.size_max: 100
 ```
+
+Finally clear the caches — `drush cr` — for the parameter to take effect.
 
 You should now be able to request up to 100 resources **using the `path` field as the first field in sparse fieldsets**.
 

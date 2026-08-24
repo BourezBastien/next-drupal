@@ -3,6 +3,7 @@ import { useTranslation } from "next-i18next"
 import Link from "next/link"
 
 import { MediaImage } from "components/media--image"
+import { nodeHref } from "lib/utils"
 
 interface NodeRecipeTeaserProps {
   node: DrupalNode
@@ -24,7 +25,7 @@ export function NodeRecipeTeaser({ node, ...props }: NodeRecipeTeaserProps) {
         </p>
       )}
       <MediaImage media={node.field_media_image} width={335} height={225} />
-      <Link href={node.path.alias} passHref>
+      <Link href={nodeHref(node)} passHref>
         <a className="inline-flex items-center uppercase hover:underline text-link">
           {t("view-recipe")}
           <svg

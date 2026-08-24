@@ -3,7 +3,7 @@ import Link from "next/link"
 import { DrupalNode } from "next-drupal"
 import { useTranslation } from "next-i18next"
 
-import { absoluteURL, formatDate } from "lib/utils"
+import { absoluteURL, formatDate, termHref } from "lib/utils"
 import { FormattedText } from "components/formatted-text"
 import { Breadcrumbs } from "components/breadcrumbs"
 import { NodeArticleCard } from "components/node--article--card"
@@ -52,7 +52,7 @@ export function NodeArticle({ node, additionalContent }: NodeArticleProps) {
             <div className="flex mb-6 space-x-2">
               <span className="font-semibold">{t("tags")}: </span>
               {node.field_tags.map((tag) => (
-                <Link key={tag.id} href={tag.path.alias} passHref>
+                <Link key={tag.id} href={termHref(tag)} passHref>
                   <a className="underline transition-colors text-link hover:text-primary hover:bg-border">
                     {tag.name}
                   </a>

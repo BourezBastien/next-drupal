@@ -3,6 +3,7 @@ import { DrupalNode } from "next-drupal"
 import { useTranslation } from "next-i18next"
 
 import { MediaImage } from "components/media--image"
+import { nodeHref } from "lib/utils"
 
 interface NodeArticleCardProps {
   node: DrupalNode
@@ -18,7 +19,7 @@ export function NodeArticleCard({ node, ...props }: NodeArticleCardProps) {
     >
       <h2 className="flex-1 font-serif text-2xl">{node.title}</h2>
       <MediaImage media={node.field_media_image} width={335} height={225} />
-      <Link href={node.path.alias} passHref>
+      <Link href={nodeHref(node)} passHref>
         <a className="inline-flex items-center uppercase hover:underline text-link">
           {t("view-article")}
           <svg
