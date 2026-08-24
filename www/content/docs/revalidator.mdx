@@ -7,7 +7,82 @@ To handle [On-demand Revalidation](https://nextjs.org/docs/basic-features/data-f
 
 A `Revalidator` plugin revalidates one or more Next.js sites when a Drupal entity is **inserted**, **updated** or **deleted**.
 
-Out of the box, the `next` module ships with the [`Path`](https://github.com/chapter-three/next-drupal/blob/main/modules/next/src/Plugin/Next/Revalidator/Path.php) revalidator. The `Path` revalidator revalidates a Next.js site based on the entity path.
+Out of the box, the `next` module ships with two revalidators:
+
+- The [`Path`](https://github.com/chapter-three/next-drupal/blob/main/modules/next/src/Plugin/Next/Revalidator/Path.php) revalidator revalidates a Next.js site based on the entity path.
+- The [`Cache Tag`](https://github.com/chapter-three/next-drupal/blob/main/modules/next/src/Plugin/Next/Revalidator/CacheTag.php) revalidator revalidates a Next.js site based on [cache tags](https://nextjs.org/docs/app/building-your-application/data-fetching/incremental-static-regeneration#using-cache-tags).
+
+Select the revalidator for each entity type at `/admin/config/services/next/entity-types`.
+
+---
+
+## Cache Tag Revalidator
+
+The `Cache Tag` revalidator sends the entity's Drupal cache tags to the Next.js revalidate URL. Combine it with the `tags` option on the frontend so list pages and pages referencing other entities are revalidated automatically.
+
+On the Drupal side, configure for example the `node.article` entity type with the `Cache Tag` revalidator. It sends:
+
+- The entity tag, e.g. `node:42`, when **Revalidate entity cache tag** is checked.
+- The list tags, e.g. `node_list` and `node_list:article`, when **Revalidate entity list cache tags** is checked.
+- Any **Additional cache tags** you configured (one per line).
+
+On the Next.js side, tag your queries accordingly.
+
+Revalidate a **list page** whenever an article is created, updated or deleted:
+
+```tsx title=app/page.tsx
+const articles = await drupal.getResourceCollection<DrupalNode[]>(
+  "node--article",
+  {
+    params: {
+      "filter[status]": 1,
+      "fields[node--article]": "title,path",
+    },
+    next: {
+      tags: ["node_list:article"],
+    },
+  }
+)
+```
+
+Revalidate a **detail page** whenever the article itself changes:
+
+```tsx title=app/blog/[slug]/page.tsx
+const node = await drupal.getResource<DrupalNode>("node--article", uuid, {
+  next: {
+    tags: [`node:${nodeInternalId}`],
+  },
+})
+```
+
+### Invalidating pages when a referenced entity changes
+
+Drupal cache tags cascade to referenced entities in render arrays, but a JSON:API response fetched by Next.js does not carry them. To invalidate a page when one of its referenced entities (a media, a taxonomy term…) changes, tag the page with the referenced entity's cache tags. Build them from the `included` relationships:
+
+```tsx title=app/blog/[slug]/page.tsx
+const node = await drupal.getResource<DrupalNode>("node--article", uuid, {
+  params: {
+    include: "field_image,field_tags",
+  },
+})
+
+// Collect cache tags of the node and every included (referenced) entity.
+const referenced: DrupalMedia[] | DrupalTaxonomyTerm[] =
+  (node.included as any[]) ?? []
+const tags = [
+  `node:${internalId}`,
+  ...referenced.map((item) => `${item.type}:${item.drupal_internal__id}`),
+]
+
+// Re-fetch with tags (second pass) or wrap the initial fetch with tags
+// derived from the translated path.
+```
+
+With this pattern, editing a media in Drupal sends `media:123` through the `Cache Tag` revalidator and every page tagged `media:123` is revalidated — no custom invalidation code needed.
+
+### Multilingual sites
+
+The revalidate URL also receives a `locale` query parameter containing the entity language (e.g. `&locale=fr`), so multilingual frontends can revalidate only the localized page variants that use it.
 
 ---
 
