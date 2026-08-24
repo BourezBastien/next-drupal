@@ -46,3 +46,4 @@ yarn-error.log*
 
 # AI tool-local dirs
 .claude/
+.phpunit-drupal/
