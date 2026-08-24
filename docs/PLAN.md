@@ -5,6 +5,37 @@
 
 ---
 
+## État d'avancement (mis à jour 2026-08-24, session 2)
+
+### Issues GitHub résolues et mergées sur main (11)
+#854 (locale prefix), #499 (type promote), #874 (meta relationships), #912 (sous-répertoire), #861 (locale + cache tags), #855 (debug sites vides), #859 (lien live révisions), #847 (docs preview→draft), #911 (revalider la source des redirects, avec test kernel), #862 + #848 (docs du revalidator cache_tag : listes et entités référencées).
+
+### PR upstream adoptées (avec attribution Co-authored-by)
+#865, #790, #791, #842, #904, #853 (durci + test SSG), #844 (durci garde null), #876, #856 (réimplémenté en option `host` explicite), #860. #846 déjà résolue en amont (#887). Dependabot : qs → 6.15.3 et nanoid → 3.3.18 appliqués nous-mêmes (remplace #908, #929).
+
+### Bugs découverts et corrigés au passage
+- `EntityActionEventDispatcher::destruct()` ne vidait pas sa file → revalidations HTTP dupliquées (processus longs).
+- Schéma de config manquant pour le revalidator `cache_tag` (impossible de sauver la config en strict).
+- Test instable `SimpleOauthPreviewUrlGeneratorTest` (timestamp `now` expirant à l'exécution).
+
+### Phase 0 — Fondations qualité : avancement
+- ✅ `noImplicitAny: true` activé sur `packages/next-drupal` (32 annotations corrigées, `@types/qs` ajouté).
+- ✅ CI fork `.github/workflows/quality.yml` : prettier + eslint + tsc + jest (env factice) côté JS ; phpcs + PHPUnit (Drupal 10.6 via core-dev-pinned, sqlite + serveur PHP intégré) côté PHP. Recette validée localement (29/29).
+- ⏭️ Prochaines étapes : `strictNullChecks` puis `strict: true` ; ESLint durci (`no-unused-vars: error`, `import/no-cycle`, boundary `next/*` dans la classe base) ; PHPStan sur `modules/next`.
+
+### Harnais de test local
+- Jest sans Drupal vivant : `cd packages/next-drupal && DRUPAL_BASE_URL=http://localhost DRUPAL_CLIENT_ID=test DRUPAL_CLIENT_SECRET=test npx jest --coverage=false` (référence : 272 passés, 86 échecs réseau préexistants).
+- PHPUnit : projet Drupal 10.6 dans `.phpunit-drupal/` (gitignoré) — voir `.agents/skills/next-drupal-dev/SKILL.md`. 29/29 verts.
+- Le dossier `drupal/` du dépôt est une install D9 obsolète (copie 1.x du module) : inutilisable pour les tests.
+
+### E2E — état des lieux (Cypress, pas Playwright)
+- 8 exemples ont des suites Cypress (`example-marketing`, `example-auth`, `example-custom-*`, `example-search-api`, `example-webform`), lancées par `yarn test:e2e:ci` (start-server-and-test + cypress run).
+- **Bloqué sans la base Drupal privée** : les specs assert du contenu faker exact ("Build Something Amazing", etc.) qui n'existe que dans la DB/tests.next-drupal.org détenue par Chapter Three (voir TESTING.md). Le `next-drupal.json`/env des exemples vise ce backend.
+- Ce qui est vérifiable sans DB : lint des specs (OK via eslint), build des exemples contre un stub (non implémenté).
+- Levier durable : créer un profil d'install Drupal avec contenu de démo déterministe (TODO déjà noté dans TESTING.md) — gros chantier, hors périmètre session.
+
+---
+
 ## 0. Retour sur la session précédente (2026-08-24)
 
 ### Réalisé et vérifié
