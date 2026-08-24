@@ -40,6 +40,18 @@ context("Seed features", () => {
     })
   })
 
+  it("exposes the seeded image media with alt text", () => {
+    cy.request(
+      "/jsonapi/media/image/00000000-0000-0000-0000-0000000000bb"
+    ).then((response) => {
+      expect(response.status).to.eq(200)
+      expect(response.body.data.attributes.name).to.eq("Next tests image")
+      // The alt text lives on the file relationship meta.
+      const meta = response.body.data.relationships.field_media_image.data.meta
+      expect(meta.alt).to.eq("Deterministic next-drupal test image")
+    })
+  })
+
   it("exposes the seeded menu link", () => {
     cy.request("/jsonapi/menu_items/main").then((response) => {
       expect(response.status).to.eq(200)
