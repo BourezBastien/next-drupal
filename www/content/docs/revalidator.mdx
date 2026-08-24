@@ -16,6 +16,29 @@ Select the revalidator for each entity type at `/admin/config/services/next/enti
 
 ---
 
+## Path Revalidator
+
+The `Path` revalidator sends the entity's path to the Next.js revalidate URL as a `path` query parameter, e.g. `?path=/blog/my-article`.
+
+### Changing an alias
+
+When an alias changes, Drupal no longer knows the old path — an entity only exposes its current URL. To keep the previous path working, install the [Redirect](https://www.drupal.org/project/redirect) module: it stores the old path and creates a redirect from it. Redirect entities are revalidated on their **source** path, so the old URL is purged from the Next.js cache and starts serving the redirect.
+
+Without the Redirect module, the old path can not be revalidated automatically — there is nothing left in Drupal pointing at it.
+
+### Trailing slashes
+
+If your Next.js site uses `trailingSlash: true`, normalize the path in your revalidate route handler before calling `revalidate`:
+
+```ts title=pages/api/revalidate.ts
+// Add the trailing slash expected by trailingSlash: true.
+const path = (req.query.slug as string).replace(/\/?$/, "/")
+
+await res.revalidate(path)
+```
+
+---
+
 ## Cache Tag Revalidator
 
 The `Cache Tag` revalidator sends the entity's Drupal cache tags to the Next.js revalidate URL. Combine it with the `tags` option on the frontend so list pages and pages referencing other entities are revalidated automatically.
