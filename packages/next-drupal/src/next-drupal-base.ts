@@ -437,7 +437,11 @@ export class NextDrupalBase {
     }
 
     let localePrefix = ""
-    if (locale && !path.startsWith(`/${locale}`) && locale !== defaultLocale) {
+    // Match an exact locale prefix segment (e.g. "/en" or "/en/foo") so paths
+    // like "/enable" are not treated as already prefixed for the "en" locale.
+    const hasLocalePrefix =
+      path === `/${locale}` || path.startsWith(`/${locale}/`)
+    if (locale && !hasLocalePrefix && locale !== defaultLocale) {
       localePrefix = `/${locale}`
     }
 
