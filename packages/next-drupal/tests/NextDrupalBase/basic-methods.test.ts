@@ -80,6 +80,23 @@ describe("buildUrl()", () => {
     expect(drupal.buildUrl(path).toString()).toEqual(path)
   })
 
+  test("preserves the base URL path for Drupal in a subdirectory", () => {
+    const subdrupal = new NextDrupalBase("http://localhost/drupal/web")
+    expect(subdrupal.buildUrl("/jsonapi/node/article").toString()).toEqual(
+      "http://localhost/drupal/web/jsonapi/node/article"
+    )
+    expect(subdrupal.buildUrl("/router/translate-path").toString()).toEqual(
+      "http://localhost/drupal/web/router/translate-path"
+    )
+  })
+
+  test("does not prefix absolute URLs with the base path", () => {
+    const subdrupal = new NextDrupalBase("http://localhost/drupal/web")
+    expect(subdrupal.buildUrl("https://example.com/foo").toString()).toEqual(
+      "https://example.com/foo"
+    )
+  })
+
   test("adds the searchParams", () => {
     expect(drupal.buildUrl("/foo", { bar: "baz" }).toString()).toEqual(
       `${BASE_URL}/foo?bar=baz`
