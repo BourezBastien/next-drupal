@@ -48,7 +48,20 @@ export async function PreviewHandler(
     }
   }
 
-  const url = await getResourcePreviewUrl(path as string, _options)
+  let url: string | null = null
+  try {
+    url = await getResourcePreviewUrl(path as string, _options)
+  } catch (error) {
+    // Surface the underlying Drupal error (e.g. a 422 from a version
+    // mismatch between the next module and next-drupal) instead of a bare
+    // "Invalid slug". (#818)
+    if (process.env.DRUPAL_DEBUG) {
+      console.error("[next-drupal][preview]", error)
+    }
+    return response.status(422).json({
+      message: (error as Error).message || "Error resolving preview url.",
+    })
+  }
 
   if (!url) {
     response
@@ -60,7 +73,7 @@ export async function PreviewHandler(
     resourceVersion,
   })
 
-  response.writeHead(307, { Location: url })
+  response.writeHead(307, { Location: url as string })
 
   return response.end()
 }
