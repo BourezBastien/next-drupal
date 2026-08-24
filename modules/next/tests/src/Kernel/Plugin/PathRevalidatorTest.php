@@ -87,13 +87,13 @@ class PathRevalidatorTest extends KernelTestBase {
     $entity_type_config->save();
 
     $client->request('GET', $this->any())->shouldNotBeCalled();
-    $page = $this->createNode();
+    $this->createNode();
     $page->save();
     $this->container->get('kernel')->terminate(Request::create('/'), new Response());
 
     $client->request('GET', 'http://blog.com/api/revalidate?path=/node/2')->shouldBeCalled()->willReturn(new GuzzleResponse());
     $blog_site->setRevalidateUrl('http://blog.com/api/revalidate')->save();
-    $page = $this->createNode();
+    $this->createNode();
     $page->save();
     $this->container->get('kernel')->terminate(Request::create('/'), new Response());
 
@@ -112,7 +112,7 @@ class PathRevalidatorTest extends KernelTestBase {
 
     $client->request('GET', 'http://marketing.com/api/revalidate?path=/node/3&secret=12345')->shouldBeCalled()->willReturn(new GuzzleResponse());
     $client->request('GET', 'http://blog.com/api/revalidate?path=/node/3')->shouldBeCalled()->willReturn(new GuzzleResponse());
-    $page = $this->createNode();
+    $this->createNode();
     $page->save();
     $this->container->get('kernel')->terminate(Request::create('/'), new Response());
 
@@ -126,7 +126,7 @@ class PathRevalidatorTest extends KernelTestBase {
     $client->request('GET', 'http://blog.com/api/revalidate?path=/node/3')->shouldBeCalled()->willReturn(new GuzzleResponse());
     $client->request('GET', 'http://blog.com/api/revalidate?path=/')->shouldBeCalled()->willReturn(new GuzzleResponse());
     $client->request('GET', 'http://blog.com/api/revalidate?path=/blog')->shouldBeCalled()->willReturn(new GuzzleResponse());
-    $page = $this->createNode();
+    $this->createNode();
     $page->save();
     $this->container->get('kernel')->terminate(Request::create('/'), new Response());
   }
@@ -175,7 +175,7 @@ class PathRevalidatorTest extends KernelTestBase {
 
     $client->request('GET', 'http://blog.com/api/revalidate?path=/old-blog')->shouldBeCalled()->willReturn(new GuzzleResponse());
 
-    $page = $this->createNode([
+    $this->createNode([
       'type' => 'page',
       'title' => 'Redirect',
       'redirect_source' => 'old-blog',
