@@ -24,6 +24,10 @@ jobs:
         run: yarn lint
       - name: Typecheck (next-drupal, strict)
         run: npx tsc --noEmit -p packages/next-drupal/tsconfig.json
+      - name: Verify esm/cjs builds
+        run: |
+          yarn workspace next-drupal prepare
+          node scripts/verify-builds.mjs
       - name: Unit tests (no live Drupal)
         # ~86 pre-existing tests require a live Drupal instance with secrets
         # (see docs/PLAN.md). Ratchet gate: fail on regressions instead of
