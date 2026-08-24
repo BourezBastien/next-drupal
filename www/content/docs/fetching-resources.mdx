@@ -67,6 +67,16 @@ Fetch an article by path.
 const article = await drupal.getResourceByPath("/blog/slug-for-article")
 ```
 
+<Callout>
+
+Not every entity type is reachable by path. Media items, for instance,
+return 404 unless **Allow users to access media items at /media/{id}** is
+enabled in the Drupal media settings at `/admin/config/media/media-settings`.
+Check the entity type's path settings and permissions when a path resolves
+to 404.
+
+</Callout>
+
 See the API reference for [getResourceByPath](/api/classes/NextDrupal#getresourcebypath).
 
 ---
