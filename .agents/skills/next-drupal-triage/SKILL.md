@@ -142,7 +142,11 @@ mergeable ones likely obsolete: #67, #306, #425, #446, #491.
 #516 (entity tokens in additional paths: the Path revalidator now replaces tokens like [node:url:path] via the token service (injected into RevalidatorBase, optional for BC), and the form description documents it — kernel-tested with [node:nid]),
 #525 (422 preview debugging: the preview handler propagates Drupal errors with DRUPAL_DEBUG logging since the #818 fix; the "Method Not Allowed on /next/preview-url" from the issue is a GET-vs-POST misconfiguration),
 #519 (basic pages: configure the node.page entity type at /admin/config/services/next/entity-types — question answered by configuration, reporter never followed up),
-#523 (umami clone 404: no reply; covered by the FAQ checklist (#448) and the alias guidance (#469) — needs-repro).
+#523 (umami clone 404: no reply; covered by the FAQ checklist (#448) and the alias guidance (#469) — needs-repro),
+#695 (sequential revalidations suspended per site: once a site's request fails, further paths skip it instead of stacking timeouts, with an explicit warning — kernel-tested),
+#619 (getAccessToken now supports the password grant: pass { username, password } with client credentials configured on the client; user tokens are never cached — jest-tested),
+#652 (Generate secret buttons on the next_site form fill the preview and revalidate secret fields with Crypt::randomBytesBase64(32), skipping validation and rebuilding — kernel-tested),
+#595 (roadmap question: answered by upstream issue #692 — closed as duplicate).
 
 Already resolved by adopted/other work (no further action): #148 (preview alerts already use a plain <a>, fix from the issue thread applied upstream), #740 (flaky coverage — Node bug mitigated by the .nvmrc v18.19 pin, referenced in .nvmrc), #838 (v1.6 menu link already correct), #581 (ESM + sideEffects:false already shipped), #746 (fixed by adopted PR #747),
 #589 (permission list incl. View all revisions already in the draft-mode guide),
