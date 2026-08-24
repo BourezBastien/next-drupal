@@ -46,7 +46,10 @@ jobs:
           DRUPAL_CLIENT_ID: test
           DRUPAL_CLIENT_SECRET: test
       - name: Run all tests (main)
-        if: github.event_name == 'push'
+        # Live-Drupal integration tests rely on Chapter Three secrets that
+        # only exist upstream. The fork runs the unit-test ratchet in
+        # quality.yml instead.
+        if: github.event_name == 'push' && github.repository == 'chapter-three/next-drupal'
         run: yarn workspace next-drupal test
         env:
           DRUPAL_BASE_URL: ${{ secrets.DRUPAL_BASE_URL }}
