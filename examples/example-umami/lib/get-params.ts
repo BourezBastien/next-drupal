@@ -3,7 +3,7 @@ import { DrupalJsonApiParams } from "drupal-jsonapi-params"
 // A helper function to build params for a resource type.
 export function getParams(
   name: string,
-  mode: string = null
+  mode: string | null = null
 ): DrupalJsonApiParams {
   const params = new DrupalJsonApiParams()
 
@@ -135,4 +135,6 @@ export function getParams(
   if (name === "taxonomy_term--recipe_category") {
     return params.addFields("taxonomy_term--recipe_category", ["name", "path"])
   }
+
+  return params
 }

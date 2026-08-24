@@ -487,6 +487,10 @@ const resources = {
       details:
         "None of the available methods were able to find a match for this path.",
     },
+    forbidden: {
+      message: "Unable to resolve path /path-is-archived.",
+      details: "The requested resource is not accessible.",
+    },
   },
   subRequests: {
     ok: {
