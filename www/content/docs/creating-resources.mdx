@@ -67,6 +67,28 @@ const article = await drupal.createResource("node--article", {
 
 See the API reference for [createResource](/api/classes/NextDrupal#createresource).
 
+### Redirecting to the created resource
+
+The created resource is returned deserialized, so for entities with a path
+field (like nodes) you can read the alias of the new resource directly from
+the response — no extra API call needed.
+
+```ts
+const article = await drupal.createResource<DrupalNode>("node--article", {
+  data: {
+    attributes: {
+      title: "My new article",
+    },
+  },
+})
+
+// article.path.alias is available when the bundle has a path field,
+// e.g. "/articles/my-new-article".
+if (article.path?.alias) {
+  redirect(article.path.alias)
+}
+```
+
 ---
 
 ## createFileResource
