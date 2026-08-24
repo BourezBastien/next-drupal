@@ -3,6 +3,7 @@
 namespace Drupal\next\Plugin\Next\Revalidator;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Url;
 use Drupal\next\Event\EntityActionEvent;
 use Drupal\next\Plugin\ConfigurableRevalidatorBase;
 use Drupal\next\Plugin\RevalidatorInterface;
@@ -73,7 +74,15 @@ class Path extends ConfigurableRevalidatorBase implements RevalidatorInterface {
 
     $paths = [];
     if (!empty($this->configuration['revalidate_page'])) {
-      $paths[] = $event->getEntityUrl();
+      try {
+        $entity_url = $event->getEntityUrl();
+        if ($entity_url instanceof Url) {
+          $paths[] = $entity_url->toString(TRUE)->getGeneratedUrl();
+        }
+      }
+      catch (\Exception $e) {
+        // Skip entities whose URL can not be generated.
+      }
     }
     if (!empty($this->configuration['additional_paths'])) {
       $paths = array_merge($paths, array_map('trim', explode("\n", $this->configuration['additional_paths'])));
