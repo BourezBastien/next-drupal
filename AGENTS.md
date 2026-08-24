@@ -2,6 +2,16 @@
 
 Monorepo for **next-drupal** — Next.js helpers for Drupal (JSON:API), the `next` Drupal module, starters, examples, and the docs site. Managed with Yarn 1 workspaces + Turborepo (build) + Lerna (versioning/publishing).
 
+**This is Bastien's fork. Read `docs/PLAN.md` first — it is the master roadmap.**
+
+## Non-negotiable rules
+
+- **Never push, open PRs, or comment on `chapter-three/next-drupal` (upstream)** — all work stays on this fork (`origin`) unless Bastien explicitly says otherwise.
+- **Zero hardcoding**: no user-facing text, no colors, no config values in code — everything translatable/configurable comes from Drupal (JSON:API content or config). Library-internal error messages for developers stay in English.
+- **i18n everywhere**: any new client API accepts `locale`/`defaultLocale`; content and labels are translated Drupal-side.
+- **Type safety**: never introduce `any`; the goal is `strict: true` (see PLAN.md Phase 0). Add precise types in `src/types/`.
+- **Conventional Commits enforced**, scope = folder name (`next-drupal`, `next`, `basic-starter`…), footer `Fixes #NNN`.
+
 ## Mandatory project skills (read before acting)
 
 This repo carries its own skills in `.agents/skills/`. **Always read the relevant one before starting work:**
@@ -9,6 +19,8 @@ This repo carries its own skills in `.agents/skills/`. **Always read the relevan
 - `.agents/skills/next-drupal-dev/SKILL.md` — before writing/building/testing any code (how to run tests without a live Drupal site).
 - `.agents/skills/next-drupal-conventions/SKILL.md` — before editing `packages/next-drupal` or `modules/next` (class hierarchy, TypeScript status, patterns, formatting, commit scopes).
 - `.agents/skills/next-drupal-triage/SKILL.md` — before triaging issues/PRs or recommending merges (ranked merge candidates, stale PRs, constraints).
+- `.agents/skills/drupal-coding-standards/SKILL.md` — before reviewing/writing PHP, CSS, YAML, or JS in `modules/next` (official Drupal standards).
+- `.agents/skills/drupal-contribute-fix/SKILL.md` and `.agents/skills/drupal-issue-queue/SKILL.md` — before patching any Drupal module bug (check drupal.org issue queues first).
 
 ## Layout
 

@@ -1,0 +1,139 @@
+# Plan stratégique — next-drupal (fork Bastien)
+
+> Document de référence de la session. Toute IA intervenant sur ce dépôt doit le lire.
+> Règle d'or : **tout se fait sur NOTRE fork (`origin` = BourezBastien/next-drupal). Aucune PR, aucun commentaire, aucun push vers `chapter-three/next-drupal` (upstream) sans instruction explicite de Bastien.**
+
+---
+
+## 0. Retour sur la session précédente (2026-08-24)
+
+### Réalisé et vérifié
+- **Environnement** : dépendances installées (yarn 1.22.15), environnement de test unitaire opérationnel sans Drupal vivant (`DRUPAL_BASE_URL=http://localhost DRUPAL_CLIENT_ID=test DRUPAL_CLIENT_SECRET=test npx jest <fichier> --coverage=false`).
+- **Correctifs commités sur branches locales** :
+  - `fix/854-add-locale-prefix` (commit `49dd523c`) — `addLocalePrefix()` ne préfixait plus `/enable/...` pour la locale `en`. 3 nouveaux tests, 44 tests OK, tsc OK.
+  - `fix/499-drupal-node-promote` (commit `394eccb9`) — champ `promote` ajouté au type `DrupalNode`. tsc OK.
+- **Documentation IA créée** : `AGENTS.md` + 3 skills projet (`.agents/skills/next-drupal-dev`, `next-drupal-conventions`, `next-drupal-triage`), commités sur `main` du fork (`0efa1533`) et poussés.
+- **Skills Drupal officiels installés** : `drupal-coding-standards`, `drupal-contribute-fix`, `drupal-issue-queue` (via `npx skills add`, verrouillés dans `skills-lock.json`).
+- **Analyse complète** : 169 issues ouvertes et 50 PR ouvertes d'upstream classées ; audit des conventions réalisé.
+
+### Constats de l'audit (point de départ)
+| Constat | Détail |
+|---|---|
+| TypeScript **non strict** | `strict: false` à la racine — incompatible avec l'objectif « 100% typesafe » |
+| `any` quasi absent | Bonne nouvelle : seulement `types/resource.ts` et `deprecated/` |
+| Encapsulation absente | Aucun `private`/`protected` — convention historique du dépôt |
+| POO présente et saine | `NextDrupalBase` → `NextDrupal` → `NextDrupalPages`, `JsonApiErrors extends Error`, `DrupalMenuTree<T>` |
+| Conventional commits réellement appliqués | commitlint + husky + lint-staged |
+| Couverture 100% imposée côté JS | `jest.config.cjs` (seuils globaux) — à préserver |
+| Dettes côté PR upstream | 22 PR dependabot, 14 PR en conflit, ~28 PR substantielles en attente depuis 2024-2025 |
+| Dettes côté issues upstream | 60 en `triage`, ~55 sans label |
+
+### Non fait / annulé
+- Ouverture des 2 PR vers upstream : **annulé sur décision de Bastien** (le fork `next-drupal-contribute` créé au passage reste inutilisé, à supprimer éventuellement).
+- Publication de revues sur les PR upstream : annulé (même décision).
+
+---
+
+## 1. Principes directeurs (standards demandés, adaptés à CE projet)
+
+Légende : ✅ déjà en place · 🔧 à mettre en place · ⏸️ plus tard · ❌ hors périmètre (lib OSS, pas une app exploitée).
+
+### 1.1 Conception & architecture
+| Principe | Application concrète ici | Statut |
+|---|---|---|
+| **SOLID** | Un client par responsabilité : Base (auth/URL/CRUD) / App Router / Pages Router. Toute nouvelle capacité va dans la bonne classe, pas « où c'est pratique ». | 🔧 codifier |
+| **KISS / YAGNI / DRY** | Pas de refactor big-bang : améliorations incrémentales, une branche = un sujet. | 🔦 règle continue |
+| **POO + design patterns** | Conserver l'héritage existant ; patterns déjà présents à nommer et documenter (Adapter pour `fetcher`/`serializer` injectables, Options Object, Error typée). Aucun pattern gratuit. | 🔧 documenter dans le skill conventions |
+| **Clean Architecture (adaptée)** | Séparer ce qui est « cœur métier » (construction URL JSON:API, désérialisation, arbres de menus) du « détail framework » (Next.js). Interdiction d'importer `next/*` dans `next-drupal-base.ts` (déjà le cas — à verrouiller par lint). | 🔧 règle lint boundary |
+| **DDD (léger)** | Le langage métier = Drupal (resources, bundles, revisions, locales, revalidation). Nommer le code avec ce vocabulaire, pas celui de Next. | 🔦 règle continue |
+| **100% typesafe** | Migration TS `strict: true` par étapes (voir Phase 0). Zéro `any` nouveau ; types précis dans `src/types/`. | 🔧 priorité maximale |
+
+### 1.2 i18n & zéro hardcodage (exigence forte de Bastien)
+| Règle | Détail |
+|---|---|
+| **Aucun texte utilisateur codé en dur** | Dans starters/examples/www : tout libellé vient de Drupal (contenu JSON:API ou config). Les chaînes de la lib elle-même restent techniques (messages d'erreur destinés aux dev) et en anglais. |
+| **Aucune couleur / style codé en dur** | Design tokens et variantes passent par Drupal (config) ou par des tokens du thème — jamais un hex figé dans un composant métier. |
+| **i18n de bout en bout** | Les chemins gèrent les locales (fix #854 déjà en place côté lib), les contenus et libellés sont traduits côté Drupal (module locale/translation), Next ne fait que consommer. Toute nouvelle fonction de la lib doit accepter `locale`/`defaultLocale`. |
+| **Config externalisée** | 12-Factor : secrets et URLs via variables d'env uniquement (déjà le cas : `DRUPAL_*`). Jamais de secret en dur (le scanning CI le vérifiera). |
+
+### 1.3 Tests & qualité
+| Pratique | Application | Statut |
+|---|---|---|
+| Pyramide de tests | Unitaires (majoritaires, sans réseau) → intégration (mock fetch) → E2E Cypress (existant, nécessite Drupal). Tout nouveau code `src/` = test unitaire (couverture 100% déjà imposée). | ✅/🔧 étendre les tests sans Drupal |
+| Linters stricts | ESLint : passer `no-unused-vars` en erreur, ajouter `no-restricted-imports` (interdire `next/*` dans la base), `import/no-cycle`. Prettier déjà en place. | 🔧 Phase 0 |
+| Analyse statique PHP | PHPStan (niveau max visé, progressif) sur `modules/next` + phpcs (déjà là, standards Drupal). | 🔧 Phase 0 |
+| Complexité | Limite de complexité cyclomatique ESLint sur `packages/next-drupal`. | ⏸️ |
+| Mutation testing, contrat, charge | | ❌/⏸️ hors périmètre immédiat |
+
+### 1.4 Collaboration & livraison
+| Pratique | Application | Statut |
+|---|---|---|
+| Conventional Commits | Déjà enforced (commitlint). Scopes = dossiers (`next-drupal`, `next`, `basic-starter`…). | ✅ |
+| SemVer | Géré par Lerna sur les versions du package. Sur le fork : versionner nos séries en `-bastien.N` si besoin sans publier. | 🔧 à définir |
+| Trunk-based léger | `main` du fork = intégration continue ; branches courtes `fix/…`, `feat/…` fusionnées vite. | 🔦 |
+| PR < 400 lignes | Règle de revue pour nos propres PR internes (le ménage upstream se fait par petits cherry-picks attribués). | 🔦 |
+| CI/CD | GitHub Actions du fork : lint + typecheck + tests unitaires à chaque push (sans secrets). | 🔧 Phase 0 |
+| ADR | `docs/adr/` : chaque décision structurante = un fichier court (contexte, décision, conséquences). | 🔧 Phase 0 |
+| DoR/DoD | Voir §6 Gouvernance. | 🔧 |
+| Dependabot | On bump nous-mêmes nos dépendances (pas de reprise des 22 PR upstream). | 🔦 |
+
+### 1.5 Explicitement hors périmètre (documenté pour ne pas y revenir)
+Kubernetes/GitOps, IaC, chaos engineering, microservices/CQRS/Event Sourcing, SLI/SLO, feature flags managés, RGPD (rien de personnel stocké). Ces standards s'appliquent à des produits exploités ; ici c'est une bibliothèque OSS + modules. Si le projet devient une plateforme, on rouvrira cette section.
+
+---
+
+## 2. Phase 0 — Fondations qualité (à faire en premier)
+
+1. **TypeScript strict par étapes** : `noImplicitAny` → `strictNullChecks` → `strict: true`, en corrigeant à chaque étape. Vérifier que `tsc --noEmit` et tsup passent à chaque pas.
+2. **ESLint durci** : `no-unused-vars: error` (TS), `no-restricted-imports` (couche base), `import/no-cycle`, complexité modérée.
+3. **PHPStan** sur `modules/next` (niveau initial 5, montée progressive) ; garder phpcs.
+4. **CI fork** : workflow `quality.yml` — prettier check + eslint + tsc + jest unitaires (sans Drupal) sur push/PR du fork.
+5. **Gouvernance** : `docs/adr/0001-strict-typescript.md`, `0002-politique-amont.md` (on n'ouvre rien vers upstream), `0003-adoption-pr-upstream.md` (politique de cherry-pick attribué).
+6. **AGENTS.md** enrichi des skills Drupal + règles i18n/zéro hardcodage (fait dans cette session, à maintenir).
+
+## 3. Phase 1 — Ménage des 50 PR upstream
+
+Stratégie : **adopter sur notre fork** les bonnes contributions (cherry-pick/rebase + attribution `Co-authored-by:`), ignorer le reste. Rien n'est fusionné côté upstream.
+
+**À adopter (ordre de priorité)** :
+1. #865 (403→404 contenu archivé), #790 + #791 (getParams), #842 (docs getResource), #904 (docs branches) — petits et sûrs.
+2. #853 (draft/SSG), #844 (revalider l'alias), #876 (workspace preview), #846 (AJAX form) — à valider par tests chez nous.
+3. #856 (host header) — à réimplémenter en option opt-in propre (pas d'import `next/headers` dans le client).
+4. #836 (Umami à jour), #747, #306, #584, #67, #425, #446, #491 — au cas par cas selon pertinence.
+
+**À ignorer** : 22 PR dependabot (on gère nos bumps), PR en conflit périmées de 2024 (#785, #795, #758, #715, #703, #762…).
+
+## 4. Phase 2 — Résolution des 169 issues, par vagues thématiques
+
+| Vague | Thème | Issues phares | Notes |
+|---|---|---|---|
+| 1 | **i18n / locales** | #854 ✅(fait), #861, #912, #854-liés | Extension naturelle de notre fix |
+| 2 | **Preview / draft mode** | #847, #852, #859, #875, #867, #855 | Le sujet n°1 des users v2 |
+| 3 | **Revalidation / cache** | #843, #862, #886, #911, #848 | Inclut l'adoption de #844 |
+| 4 | **Bugs isolés** | #874, #849, #857, #850, #854 | Chaque fix = test unitaire |
+| 5 | **Questions / docs** | issues `question` (22) | Répondre, labelliser, fermer si résolu |
+
+Règle par issue : reproduire (test rouge) → corriger → test vert → coverage maintenue à 100% → commit conventionnel `fix(next-drupal): ... Fixes #NNN`.
+
+## 5. Phase 3 — Architecture cible « tout piloté depuis Drupal »
+
+1. **Audit zéro-hardcodage** des starters/examples/www : lister textes, couleurs, configs codés en dur ; les faire venir de Drupal (config entities du module `next`, contenu JSON:API).
+2. **i18n complet** : propager `locale`/`defaultLocale` dans toutes les API de la lib ; documenter le pattern de traduction côté contenu.
+3. **Module `next` en POO propre** : s'appuyer sur les plugins Drupal existants (SitePreviewer, Revalidator, SiteResolver) — chaque extension = un plugin, jamais un `if` ajouté au cœur.
+4. **Types générés (exploration)** : génération de types TS depuis les définitions d'entités Drupal (custom codegen ou outil existant) pour tendre vers le « typesafe 100% » bout en bout.
+5. **ADR + skills à jour** à chaque étape.
+
+## 6. Gouvernance
+
+**Definition of Ready (une issue entre en travail si)** : reproduisible ou spécifiée clairement ; rattachée à une vague ; pas de doublon ouvert.
+
+**Definition of Done (une branche est finie si)** :
+- [ ] tests unitaires verts, couverture globale ≥ 100% maintenue
+- [ ] `tsc --noEmit` strict OK (dès que Phase 0.1 faite)
+- [ ] eslint + prettier OK
+- [ ] commit conventionnel avec scope + `Fixes #NNN`
+- [ ] aucun texte/couleur codé en dur introduit
+- [ ] doc/skill mise à jour si comportement public change
+- [ ] rien poussé vers upstream
+
+**Traçabilité** : chaque décision structurante = ADR numéroté dans `docs/adr/`. Chaque adoption de PR upstream = attribution de l'auteur d'origine dans le commit.

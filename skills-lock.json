@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "skills": {
+    "drupal-coding-standards": {
+      "source": "https://git.drupalcode.org/project/ai_skills.git",
+      "sourceUrl": "https://git.drupalcode.org/project/ai_skills.git",
+      "ref": "1.0.x",
+      "sourceType": "gitlab",
+      "skillPath": "skills/drupal-coding-standards/SKILL.md",
+      "computedHash": "97f355ca32d8d746e70c4e23d8cf86524aaa26b902867f6c00742b368fcb826a"
+    },
+    "drupal-contribute-fix": {
+      "source": "https://git.drupalcode.org/project/ai_skills.git",
+      "sourceUrl": "https://git.drupalcode.org/project/ai_skills.git",
+      "ref": "1.0.x",
+      "sourceType": "gitlab",
+      "skillPath": "skills/drupal-contribute-fix/SKILL.md",
+      "computedHash": "9a47ee67e436e37fdcd8f1ef458c4e4862ae1746adf5acebb2382568e7a70acd"
+    },
+    "drupal-issue-queue": {
+      "source": "https://git.drupalcode.org/project/ai_skills.git",
+      "sourceUrl": "https://git.drupalcode.org/project/ai_skills.git",
+      "ref": "1.0.x",
+      "sourceType": "gitlab",
+      "skillPath": "skills/drupal-issue-queue/SKILL.md",
+      "computedHash": "a5157f89598b6c7c3adb80fa875e66b916216e702b0f7662a908e70c6b6b593f"
+    }
+  }
+}
