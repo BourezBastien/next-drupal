@@ -41,7 +41,12 @@ final class EntityActionEventDispatcher implements DestructableInterface {
    * {@inheritdoc}
    */
   public function destruct() {
-    foreach ($this->events as $event) {
+    $events = $this->events;
+    // Reset the queue before dispatching so events are not dispatched again
+    // if destruct() runs more than once in the same process (e.g. in tests,
+    // Drush commands or queue workers).
+    $this->events = [];
+    foreach ($events as $event) {
       $this->eventDispatcher->dispatch($event, EntityEvents::ENTITY_ACTION);
     }
   }
