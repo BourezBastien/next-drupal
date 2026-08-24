@@ -8,8 +8,11 @@
 declare(strict_types=1);
 
 use Drupal\Core\File\FileSystemInterface;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use Drupal\taxonomy\Entity\Vocabulary;
 
 /**
  * Implements hook_install().
@@ -131,4 +134,159 @@ function next_tests_seed_install(): void {
       ])->save();
     }
   }
+
+  // An article pattern (body + image + taxonomy tags) mirroring the
+  // marketing/blog examples, so their spec families can be replayed against
+  // deterministic content.
+  next_tests_seed_create_article($storage);
+}
+
+/**
+ * Creates the article content type, its fields and one seeded article.
+ *
+ * @param \Drupal\Core\Entity\EntityStorageInterface $storage
+ *   The node storage.
+ */
+function next_tests_seed_create_article($storage): void {
+  if (!NodeType::load('next_test_article')) {
+    NodeType::create([
+      'type' => 'next_test_article',
+      'name' => 'Next test article',
+      'display_submitted' => FALSE,
+    ])->save();
+  }
+
+  $fields = [
+    'next_test_body' => [
+      'type' => 'text_with_summary',
+      'label' => 'Body',
+    ],
+  ];
+  foreach ($fields as $name => $settings) {
+    if (!FieldStorageConfig::loadByName('node', $name)) {
+      FieldStorageConfig::create([
+        'field_name' => $name,
+        'entity_type' => 'node',
+        'type' => $settings['type'],
+        'cardinality' => 1,
+      ])->save();
+    }
+    if (!FieldConfig::loadByName('node', 'next_test_article', $name)) {
+      FieldConfig::create([
+        'field_name' => $name,
+        'entity_type' => 'node',
+        'bundle' => 'next_test_article',
+        'label' => $settings['label'],
+      ])->save();
+    }
+  }
+
+  // Taxonomy tag reference, only when taxonomy is available.
+  $tag = NULL;
+  if (\Drupal::moduleHandler()->moduleExists('taxonomy')) {
+    if (!FieldStorageConfig::loadByName('node', 'next_test_tags')) {
+      FieldStorageConfig::create([
+        'field_name' => 'next_test_tags',
+        'entity_type' => 'node',
+        'type' => 'entity_reference',
+        'cardinality' => -1,
+        'settings' => [
+          'target_type' => 'taxonomy_term',
+        ],
+      ])->save();
+    }
+    if (!FieldConfig::loadByName('node', 'next_test_article', 'next_test_tags')) {
+      FieldConfig::create([
+        'field_name' => 'next_test_tags',
+        'entity_type' => 'node',
+        'bundle' => 'next_test_article',
+        'label' => 'Tags',
+        'settings' => [
+          'handler' => 'default:taxonomy_term',
+          'handler_settings' => [
+            'target_bundles' => ['next_test_tags' => 'next_test_tags'],
+          ],
+        ],
+      ])->save();
+    }
+
+    if (!Vocabulary::load('next_test_tags')) {
+      Vocabulary::create([
+        'vid' => 'next_test_tags',
+        'name' => 'Next tests tags',
+      ])->save();
+    }
+    $term_storage = \Drupal::entityTypeManager()->getStorage('taxonomy_term');
+    $existing = $term_storage->loadByProperties(['name' => 'Next tests tag']);
+    $tag = reset($existing);
+    if (!$tag) {
+      $tag = $term_storage->create([
+        'name' => 'Next tests tag',
+        'vid' => 'next_test_tags',
+        'uuid' => '00000000-0000-0000-0000-0000000000cc',
+      ]);
+      $tag->save();
+    }
+  }
+
+  // Image reference, only when the seeded media exists.
+  $media_id = NULL;
+  if (\Drupal::moduleHandler()->moduleExists('media')) {
+    $media = \Drupal::entityTypeManager()->getStorage('media')
+      ->loadByProperties(['name' => 'Next tests image']);
+    $media = reset($media);
+    if ($media) {
+      $media_id = $media->id();
+      if (!FieldStorageConfig::loadByName('node', 'next_test_image')) {
+        FieldStorageConfig::create([
+          'field_name' => 'next_test_image',
+          'entity_type' => 'node',
+          'type' => 'entity_reference',
+          'cardinality' => 1,
+          'settings' => [
+            'target_type' => 'media',
+          ],
+        ])->save();
+      }
+      if (!FieldConfig::loadByName('node', 'next_test_article', 'next_test_image')) {
+        FieldConfig::create([
+          'field_name' => 'next_test_image',
+          'entity_type' => 'node',
+          'bundle' => 'next_test_article',
+          'label' => 'Image',
+          'settings' => [
+            'handler' => 'default:media',
+            'handler_settings' => [
+              'target_bundles' => ['image' => 'image'],
+            ],
+          ],
+        ])->save();
+      }
+    }
+  }
+
+  $uuid = '00000000-0000-0000-0000-0000000000dd';
+  if ($storage->loadByProperties(['uuid' => $uuid])) {
+    return;
+  }
+
+  $values = [
+    'type' => 'next_test_article',
+    'title' => 'Next tests article',
+    'next_test_body' => [
+      'value' => 'Deterministic next-drupal test article body.',
+      'format' => 'plain_text',
+    ],
+    'path' => ['alias' => '/next-tests/article'],
+    'status' => 1,
+    'uuid' => $uuid,
+  ];
+  if ($tag) {
+    $values['next_test_tags'] = ['target_id' => $tag->id()];
+  }
+  if ($media_id) {
+    $values['next_test_image'] = ['target_id' => $media_id];
+  }
+
+  Node::create($values)->save();
 }

@@ -59,4 +59,30 @@ context("Seed features", () => {
       expect(titles).to.include("Next tests home link")
     })
   })
+
+  it("exposes the seeded article with its alias", () => {
+    cy.request("/jsonapi/node/next_test_article?filter[status]=1").then(
+      (response) => {
+        expect(response.status).to.eq(200)
+        expect(response.body.data).to.have.length(1)
+        const attributes = response.body.data[0].attributes
+        expect(attributes.title).to.eq("Next tests article")
+        expect(attributes.path.alias).to.eq("/next-tests/article")
+      }
+    )
+  })
+
+  it("references the seeded taxonomy term from the article", () => {
+    cy.request("/jsonapi/taxonomy_term/next_test_tags").then((response) => {
+      expect(response.status).to.eq(200)
+      const names = response.body.data.map((term) => term.attributes.name)
+      expect(names).to.include("Next tests tag")
+    })
+  })
+
+  it("renders the seeded article", () => {
+    // The Next.js app runs on its own port; the Drupal site is the baseUrl.
+    cy.visit(`http://127.0.0.1:3000/next-tests/article`)
+    cy.get("[data-cy=node-title]").should("contain", "Next tests article")
+  })
 })

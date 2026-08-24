@@ -58,6 +58,9 @@ Parcours des issues ouvertes **par ordre croissant de numéro** (#1 → dernièr
 - Constats du scan monorepo complet (non actionnés, examples/www hors gates E2E) : fichiers présumés morts dans `examples/*/cypress/support`, `www/components/doc-search.tsx`, composants link examples ; FAUX POSITIFS connus : `modules/next/css|js/next.site_preview.iframe.*` (chargés via libraries yml, pas d'imports JS). À revoir uniquement si on modernise les examples.
 
 ### E2E : chantier next_tests — PIPELINE OPÉRATIONNEL (session 6)
+- ✅ Message Slack prêt à poster pour la DB Chapter Three : `docs/SLACK-DB-REQUEST.md` (action Bastien, Slack #nextjs).
+- ✅ Décision (session 28) : **poursuite du seed déterministe** prioritaire sur le chantier moderne — la migration Playwright n'aurait pas de sens avant que les specs legacy soient réécrites sur un contenu déterministe ; le seed est la seule voie autonome.
+- ✅ Seed étendu au pattern « article » (type next_test_article + body + référence image média + référence tags taxonomy, vocabulaire next_test_tags, terme « Next tests tag », article « Next tests article » alias /next-tests/article) — le cœur des examples marketing/blog est désormais rejouable. **Cypress 13/13** (3 nouvelles specs : collection article, terme, rendu Next).
 - ✅ **Cypress 3/3 specs PASSENT** contre un site Drupal local seedé (JSON:API index, contenu déterministe, decoupled router) — exécution réelle, sans DB Chapter Three.
 - ✅ Script reproductible `test/e2e/install-drupal.sh` + doc `test/e2e/README.md` (pièges documentés : chemin sqlite ≤128, purge conteneur périmé, extraction binaire cypress).
 - ✅ **Specs seed-features (révisions + menu) passantes** : UUIDs 36 chars corrects, 2e révision, lien de menu, permission de révision anonyme — **9/9 specs cypress**.
