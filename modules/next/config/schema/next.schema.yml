@@ -76,6 +76,19 @@ next.revalidator.configuration.path:
       type: string
       label: 'Additional paths'
 
+next.revalidator.configuration.cache_tag:
+  type: mapping
+  mapping:
+    entity_tag:
+      type: boolean
+      label: 'Revalidate entity cache tag'
+    entity_list_tag:
+      type: boolean
+      label: 'Revalidate entity list cache tags'
+    additional_tags:
+      type: string
+      label: 'Additional cache tags'
+
 next.settings:
   type: config_object
   label: 'Next settings'

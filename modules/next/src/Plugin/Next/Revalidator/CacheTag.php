@@ -170,6 +170,17 @@ class CacheTag extends ConfigurableRevalidatorBase implements RevalidatorInterfa
       return FALSE;
     }
 
+    if (!count($sites)) {
+      if ($this->nextSettingsManager->isDebug()) {
+        $this->logger->debug('(@action): No Next.js sites found for @entity_type:@entity_id. Verify the Next.js entity type configuration for this bundle.', [
+          '@action' => $event->getAction(),
+          '@entity_type' => $entity->getEntityTypeId(),
+          '@entity_id' => $entity->id(),
+        ]);
+      }
+      return FALSE;
+    }
+
     $cache_tags = [];
 
     // Add individual entity cache tags if enabled.
@@ -210,7 +221,12 @@ class CacheTag extends ConfigurableRevalidatorBase implements RevalidatorInterfa
     /** @var \Drupal\next\Entity\NextSite $site */
     foreach ($sites as $site) {
       try {
-        $revalidate_url = $site->buildRevalidateUrl(['tags' => $cache_tags_string]);
+        $revalidate_url = $site->buildRevalidateUrl([
+          'tags' => $cache_tags_string,
+          // Forward the entity language so multilingual Next.js sites can
+          // revalidate the localized page variants.
+          'locale' => $entity->language()->getId(),
+        ]);
         if (!$revalidate_url) {
           throw new \Exception('No revalidate url set.');
         }

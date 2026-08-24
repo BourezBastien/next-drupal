@@ -69,6 +69,13 @@ class Path extends ConfigurableRevalidatorBase implements RevalidatorInterface {
 
     $sites = $event->getSites();
     if (!count($sites)) {
+      if ($this->nextSettingsManager->isDebug()) {
+        $this->logger->debug('(@action): No Next.js sites found for @entity_type:@entity_id. Verify the Next.js entity type configuration for this bundle.', [
+          '@action' => $event->getAction(),
+          '@entity_type' => $event->getEntity()->getEntityTypeId(),
+          '@entity_id' => $event->getEntity()->id(),
+        ]);
+      }
       return FALSE;
     }
 
