@@ -29,6 +29,10 @@ Yes. Keep the two applications in separate containers: Drupal in a PHP container
 
 The hosted demo at [demo.next-drupal.org](https://demo.next-drupal.org) has authentication enabled — sign in with the username `example` and the password `example`.
 
+## Does logging into the Next.js site log me into Drupal too?
+
+No. The two applications keep separate sessions: authenticating on the Next.js side stores an OAuth access token for the frontend and never sets a Drupal session cookie. Signing into the Drupal backend (for editing) is a separate step. Sharing one login across both would require a dedicated single sign-on setup, which is outside what next-drupal provides.
+
 ## Error: Failed to fetch JSON:API index
 
 The Next.js server could not reach your Drupal backend. Check, in order:
