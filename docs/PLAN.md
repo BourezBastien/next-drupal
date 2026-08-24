@@ -40,7 +40,11 @@
 ### Dette dépendances dev (post-audit 2026-08-24)
 `yarn audit` : 1069 constats (29 critiques), tous dans la toolchain dev des examples/www/starters (node-tar, form-data via cypress 9 / vieux glob, etc.). Les dépendances **runtime du package publié** (jsona, qs 6.15.3, node-cache, next, react) sont propres. Traitement = projet dédié de modernisation (majors cypress 9→14, next 14→15 par exemple), pas des bumps au fil de l'eau.
 
-### E2E : chantier next_tests ENGAGÉ (session 5)
+### E2E : chantier next_tests — PIPELINE OPÉRATIONNEL (session 6)
+- ✅ **Cypress 3/3 specs PASSENT** contre un site Drupal local seedé (JSON:API index, contenu déterministe, decoupled router) — exécution réelle, sans DB Chapter Three.
+- ✅ Script reproductible `test/e2e/install-drupal.sh` + doc `test/e2e/README.md` (pièges documentés : chemin sqlite ≤128, purge conteneur périmé, extraction binaire cypress).
+- ⏭️ Suite : builder un starter contre ce site et étendre les specs (rendu de pages), puis réécrire les specs faker historiques.
+- La demande de DB Chapter Three reste pertinente pour les specs legacy (action Bastien, Slack #nextjs).
 - ✅ Module seed déterministe `modules/next/tests/modules/next_tests_seed` (type dédié + pages à titres/alias fixes) avec test kernel (32/32).
 - ⏭️ Suite : script d'installation de site complet (drush site:install + next + seed + config NextSite), puis specs Cypress smoke contre le seed, puis réécriture progressive des specs faker.
 - La demande de DB Chapter Three reste le raccourci (action Bastien, Slack #nextjs).
