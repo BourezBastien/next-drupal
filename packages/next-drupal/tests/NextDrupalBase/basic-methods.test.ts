@@ -249,6 +249,48 @@ describe("constructPathFromSegment()", () => {
     })
   })
 
+  describe("with per-locale front pages", () => {
+    test("resolves the front page for the given locale", () => {
+      const localized = new NextDrupalBase(BASE_URL, {
+        frontPage: {
+          default: "/home",
+          de: "/startseite",
+          en: "/home",
+        },
+      })
+
+      expect(
+        localized.constructPathFromSegment(undefined, {
+          locale: "de",
+          defaultLocale: "de",
+        })
+      ).toBe("/startseite")
+      expect(
+        localized.constructPathFromSegment(undefined, {
+          locale: "en",
+          defaultLocale: "en",
+        })
+      ).toBe("/home")
+    })
+
+    test("falls back to the default entry for unknown locales", () => {
+      const localized = new NextDrupalBase(BASE_URL, {
+        frontPage: {
+          default: "/accueil",
+          fr: "/accueil",
+        },
+      })
+
+      expect(
+        localized.constructPathFromSegment(undefined, {
+          locale: "it",
+          defaultLocale: "it",
+        })
+      ).toBe("/accueil")
+      expect(localized.constructPathFromSegment(undefined)).toBe("/accueil")
+    })
+  })
+
   describe("with pathPrefix option", () => {
     const pathPrefix = "/prefix"
     const options = {
