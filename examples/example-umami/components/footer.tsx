@@ -9,6 +9,7 @@ import { useTranslation } from "next-i18next"
 import { MediaImage } from "components/media--image"
 import { FormattedText } from "components/formatted-text"
 import { MenuFooter } from "components/menu-footer"
+import { termHref } from "lib/utils"
 
 export interface FooterProps {
   menus: {
@@ -34,7 +35,7 @@ export function Footer({ menus, blocks }: FooterProps) {
             </h2>
             <div className="grid max-w-4xl mx-auto mt-4 text-sm text-center md:text-left md:grid-cols-4 gap-y-3 gap-x-4">
               {blocks.recipeCollections.map((tag) => (
-                <Link key={tag.id} href={tag.path.alias} passHref>
+                <Link key={tag.id} href={termHref(tag)} passHref>
                   <a className="font-semibold hover:underline">{tag.name}</a>
                 </Link>
               ))}
