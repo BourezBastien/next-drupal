@@ -3,6 +3,7 @@
 namespace Drupal\Tests\next\Kernel\Renderer\MainContent;
 
 use Drupal\KernelTests\KernelTestBase;
+use Drupal\Core\Url;
 use Drupal\next\Controller\NextSiteEntityController;
 use Drupal\next\Entity\NextSite;
 
@@ -18,7 +19,7 @@ class NextSiteEntityControllerTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['next'];
+  protected static $modules = ['consumers', 'file', 'image', 'next', 'system', 'user'];
 
   /**
    * The next_site entity.
@@ -55,6 +56,13 @@ class NextSiteEntityControllerTest extends KernelTestBase {
     $this->assertEquals(\Drupal::requestStack()->getCurrentRequest()->getSchemeAndHttpHost(), $build['container']['NEXT_PUBLIC_DRUPAL_BASE_URL']['#context']['value']);
     $this->assertEquals(\Drupal::requestStack()->getCurrentRequest()->getHost(), $build['container']['NEXT_IMAGE_DOMAIN']['#context']['value']);
     $this->assertEquals($this->nextSite->getRevalidateSecret(), $build['container']['DRUPAL_REVALIDATE_SECRET']['#context']['value']);
+
+    // The consumer hint must point at the routed collection path, not a
+    // hardcoded URL.
+    $consumer_url = Url::fromRoute('entity.consumer.collection')->toString();
+    $expected_hint = 'Retrieve this from ' . $consumer_url;
+    $this->assertEquals($expected_hint, $build['container']['DRUPAL_CLIENT_ID']['#context']['value']);
+    $this->assertEquals($expected_hint, $build['container']['DRUPAL_CLIENT_SECRET']['#context']['value']);
   }
 
   /**
