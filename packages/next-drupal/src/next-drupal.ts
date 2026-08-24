@@ -1257,6 +1257,7 @@ export class NextDrupal extends NextDrupalBase {
     })
 
     this.debug(`Fetching view, ${viewId}.${displayId}.`)
+    this.debug(endpoint)
 
     const response = await this.fetch(endpoint, {
       withAuth: options.withAuth,

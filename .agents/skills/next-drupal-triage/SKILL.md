@@ -131,7 +131,9 @@ mergeable ones likely obsolete: #67, #306, #425, #446, #491.
 #465 (SEO guide added: Metatag via JSON:API, sitemap wiring through robots.ts, GTM with next/script, redirects pointer),
 #447 (demo credentials documented in the FAQ: demo.next-drupal.org with example/example),
 #448 (JSON:API index fetch failure: troubleshooting checklist in the FAQ — server-side reachability, subdirectory base URL, local https),
-#452 (link field aliases: jsonapi_extras URL enhancer or the core computed-URL patch — FAQ entry).
+#452 (link field aliases: jsonapi_extras URL enhancer or the core computed-URL patch — FAQ entry),
+#474 (install profile: jsonapi_hypermedia added to drupal/config/core.extension.yml, as proposed by upstream PR #491 — jsonapi_menu_items requires it),
+#483 (getView now logs the endpoint in debug mode, matching the reporter's ask).
 
 Already resolved by adopted/other work (no further action): #148 (preview alerts already use a plain <a>, fix from the issue thread applied upstream), #740 (flaky coverage — Node bug mitigated by the .nvmrc v18.19 pin, referenced in .nvmrc), #838 (v1.6 menu link already correct), #581 (ESM + sideEffects:false already shipped), #746 (fixed by adopted PR #747),
 #589 (permission list incl. View all revisions already in the draft-mode guide),
@@ -223,7 +225,15 @@ rendering early during jsonapi_menu_items requests — third-party bug, not
 actionable here),
 #431 (Guzzle timeout during revalidation: deferred enhancement — a
 configurable timeout per revalidator needs form + schema design; failures
-are already logged since #696 and the Drupal http_client default applies).
+are already logged since #696 and the Drupal http_client default applies),
+#472 (sporadic 404s: no reproduction and no reply since 2023 — symptomatic
+of ISR first-hit generation; fallback blocking covers it, needs-repro),
+#479 (exposed view filters: tracked in the jsonapi_views contrib queue
+(d.o. 3292906) — getView already forwards params, nothing to do here),
+#482 (GraphQL taxonomy 500: drupal/graphql + graphql_compose beta
+integration bug — third-party, resolved upstream since),
+#488 (500 with __next_preview_data cookie: a Next.js bug fixed in later
+versions, resolved by the reporter's upgrade).
 
 ## Process (from session 19, Bastien's directive)
 
