@@ -105,6 +105,8 @@ describe("getAccessToken with the password grant", () => {
     expect(init.body.toString()).toContain("grant_type=password")
     expect(init.body.toString()).toContain("username=editor")
     expect(init.body.toString()).toContain("password=secret")
+    // Token requests must never be cached by the fetch layer. (#788)
+    expect(init.cache).toBe("no-store")
   })
 
   test("does not cache user tokens across requests", async () => {
