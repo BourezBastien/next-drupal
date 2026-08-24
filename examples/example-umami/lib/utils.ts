@@ -21,7 +21,22 @@ export function termHref(term: DrupalTaxonomyTerm): string {
 }
 
 export function absoluteURL(uri: string) {
-  return `${siteConfig.drupalBaseUrl}${uri}`
+  const baseUrl = siteConfig.drupalBaseUrl
+
+  // Already absolute: return as-is.
+  if (/^https?:\/\//i.test(uri)) {
+    return uri
+  }
+
+  // Drupal in a subdirectory can return paths that already include the
+  // base path: avoid duplicating it. (#729)
+  const url = new URL(baseUrl)
+  const basePath = url.pathname.replace(/\/+$/, "")
+  if (basePath && uri.startsWith(basePath)) {
+    return `${url.origin}${uri}`
+  }
+
+  return `${baseUrl.replace(/\/+$/, "")}${uri}`
 }
 
 export function formatDate(input: string): string {
