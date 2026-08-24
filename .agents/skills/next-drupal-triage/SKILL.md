@@ -67,6 +67,39 @@ mergeable ones likely obsolete: #67, #306, #425, #446, #491.
 3. i18n/locale paths (#854 — fixed on branch `fix/854-add-locale-prefix`)
 4. Next.js 16 compatibility (#884)
 
+## Issues parked as needs-reproduction (do not force a blind fix)
+
+- **#849** (jsona returns `{type,id,links}` skeletons): no reproduction in our
+  harness; reporter's raw JSON:API responses look fine. Next step: ask for the
+  raw `/jsonapi/node/x` payload and the next-drupal + Drupal versions; suspect
+  a contrib module altering the payload (JSON:API extras) or a proxy.
+- **#857** (headless view missing on canonical tab): `HtmlRenderer::prepare`
+  already covers `entity.$type.canonical` (verified in source), so the report
+  contradicts the code path — needs an interactive Drupal reproduction. Check
+  the site resolver actually resolving sites for the canonical entity, and the
+  `site_previewer` setting.
+
+## Resolved on the fork (status as of session 2)
+
+#854, #499, #874, #912, #861, #855, #859, #847, #911, #862, #848, #850.
+Adopted upstream PRs: #865, #790, #791, #842, #904, #853, #844, #876, #856
+(adapted as `host` option), #860 (#846 was already fixed upstream by #887).
+
+## E2E Cypress blocker — how to lift it
+
+Execution requires content that only exists in Chapter Three's private Drupal
+database (faker-generated strings asserted verbatim by the specs, see
+TESTING.md). Two ways forward, pick one when prioritizing E2E:
+
+1. **Obtain a DB copy** — ask Chapter Three (Drupal Slack `#nextjs` channel)
+   for the tests.next-drupal.org database dump + files, restore it in `drupal/`.
+2. **Deterministic install profile** — build a `next_tests` install profile
+   (config + seeded demo content matching the specs), then rewrite the spec
+   assertions against the seed. Bigger but self-contained; already a TODO in
+   TESTING.md.
+
+Until then, E2E is out of every gate; unit/Kernel gates remain authoritative.
+
 ## Etiquette
 
 - Comment in English on GitHub regardless of local language.

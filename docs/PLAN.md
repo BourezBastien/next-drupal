@@ -32,7 +32,16 @@
 - 8 exemples ont des suites Cypress (`example-marketing`, `example-auth`, `example-custom-*`, `example-search-api`, `example-webform`), lancées par `yarn test:e2e:ci` (start-server-and-test + cypress run).
 - **Bloqué sans la base Drupal privée** : les specs assert du contenu faker exact ("Build Something Amazing", etc.) qui n'existe que dans la DB/tests.next-drupal.org détenue par Chapter Three (voir TESTING.md). Le `next-drupal.json`/env des exemples vise ce backend.
 - Ce qui est vérifiable sans DB : lint des specs (OK via eslint), build des exemples contre un stub (non implémenté).
-- Levier durable : créer un profil d'install Drupal avec contenu de démo déterministe (TODO déjà noté dans TESTING.md) — gros chantier, hors périmètre session.
+- **Levée du blocage — deux options à arbitrer** :
+  1. **Obtenir une copie de la DB** auprès de Chapter Three (Slack Drupal `#nextjs`) — dump tests.next-drupal.org + fichiers, à restaurer dans `drupal/`. Plus rapide, dépend d'un tiers.
+  2. **Profil d'install déterministe** — module/profile `next_tests` avec config + contenu de démo seedé correspondant aux specs, puis réécriture des assertions sur le seed. Autonome mais gros chantier (TODO déjà dans TESTING.md).
+- Jusqu'à l'arbitrage, E2E reste hors des gates ; les gates unitaires (Jest ratchet + PHPUnit + phpcs) font foi.
+
+### Dette dépendances dev (post-audit 2026-08-24)
+`yarn audit` : 1069 constats (29 critiques), tous dans la toolchain dev des examples/www/starters (node-tar, form-data via cypress 9 / vieux glob, etc.). Les dépendances **runtime du package publié** (jsona, qs 6.15.3, node-cache, next, react) sont propres. Traitement = projet dédié de modernisation (majors cypress 9→14, next 14→15 par exemple), pas des bumps au fil de l'eau.
+
+### strictNullChecks — mesuré
+66 erreurs (46 hors `deprecated/`) : sémantique d'optionalité de `auth`, gestion des `string | null` dans les flux fetch. Prochaine étape Phase 0 : branche dédiée, correction par fichiers (base → app → pages), activation du flag à la fin.
 
 ---
 
