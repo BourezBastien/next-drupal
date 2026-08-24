@@ -1,0 +1,28 @@
+parameters:
+  level: 5
+  paths:
+    - src
+    - tests/src
+  excludePaths:
+    - src/ProxyClass
+  ignoreErrors:
+    # Drupal entity/plugin conventions: annotated plugin classes and
+    # controllers use new static() and \Drupal service access by design.
+    - '#Unsafe usage of new static#'
+    - '#\\Drupal calls should be avoided in classes, use dependency injection instead#'
+    # Config entity lazy collections and plugin resolution rely on runtime
+    # typing PHPStan cannot prove.
+    - '#Call to an undefined method Drupal\\Core\\Entity\\EntityInterface::#'
+    - '#Call to an undefined method Drupal\\Core\\Form\\FormInterface::#'
+    - '#Access to an undefined property#'
+    - '#should return array<Drupal\\next\\Entity\\NextSiteInterface> but returns#'
+    - '#Method .*invoked with 4 parameters, 1 required#'
+    - '#If condition is always true#'
+    - '#Negated boolean expression is always false#'
+    - '#Left side of && is always true#'
+    - '#Ternary operator condition is always true#'
+    - '#Result of \\|\\| is always false#'
+    - '#always exists and is not falsy#'
+    - '#Variable \$.* in PHPDoc tag @var does not exist#'
+    # Test assertions on entities that exist by construction.
+    - '#Cannot call method .* on null#'

@@ -72,9 +72,11 @@ jobs:
           composer config preferred-install dist
           composer config repositories.0 composer https://packages.drupal.org/8
           composer config audit.block-insecure false
-          COMPOSER_MEMORY_LIMIT=-1 composer require "drupal/core-dev-pinned:${{ matrix.drupal }}" drupal/coder --no-interaction -W
+          COMPOSER_MEMORY_LIMIT=-1 composer require "drupal/core-dev-pinned:${{ matrix.drupal }}" drupal/coder phpstan/phpstan --no-interaction -W
       - name: Run phpcs
         run: ~/drupal/vendor/bin/phpcs -p -s --colors --standard=modules/next/phpcs.xml modules/next
+      - name: Run phpstan
+        run: cd modules/next && ~/drupal/vendor/bin/phpstan analyse --no-progress --memory-limit=1G
       - name: Copy module
         run: cp -R modules/next ~/drupal/web/modules/next
       - name: Run php built-in server
