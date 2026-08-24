@@ -110,7 +110,11 @@ export class NextDrupalBase {
     return this._apiPrefix
   }
 
-  set auth(auth: NextDrupalAuth) {
+  set auth(auth: NextDrupalAuth | undefined) {
+    if (typeof auth === "undefined") {
+      return
+    }
+
     if (typeof auth === "object") {
       const checkUsernamePassword = auth as NextDrupalAuthUsernamePassword
       const checkAccessToken = auth as NextDrupalAuthAccessToken
@@ -155,7 +159,7 @@ export class NextDrupalBase {
     }
   }
 
-  get auth() {
+  get auth(): NextDrupalAuth | undefined {
     return this._auth
   }
 
@@ -172,7 +176,7 @@ export class NextDrupalBase {
     this._tokenExpiresOn = Date.now() + token.expires_in * 1000
   }
 
-  get token() {
+  get token(): AccessToken | undefined {
     return this._token
   }
 
@@ -206,7 +210,10 @@ export class NextDrupalBase {
     if (init?.headers) {
       const initHeaders = new Headers(init?.headers)
       for (const key of initHeaders.keys()) {
-        headers.set(key, initHeaders.get(key))
+        const value = initHeaders.get(key)
+        if (value !== null) {
+          headers.set(key, value)
+        }
       }
     }
 
@@ -243,8 +250,14 @@ export class NextDrupalBase {
    * @param {NextDrupalAuth} auth The auth configuration.
    * @returns {Promise<string>} The authorization header value.
    */
-  async getAuthorizationHeader(auth: NextDrupalAuth) {
+  async getAuthorizationHeader(auth: NextDrupalAuth | undefined) {
     let header: string
+
+    if (typeof auth === "undefined") {
+      throw new Error(
+        "auth is not configured. See https://next-drupal.org/docs/client/auth"
+      )
+    }
 
     if (isBasicAuth(auth)) {
       const basic = Buffer.from(`${auth.username}:${auth.password}`).toString(
@@ -495,19 +508,20 @@ export class NextDrupalBase {
       )
     }
 
-    const url = this.buildUrl(auth.url)
+    const url = this.buildUrl(auth.url ?? DEFAULT_AUTH_URL)
 
     // Ensure that the unexpired token was using the same scope and client
     // credentials as the current request before re-using it.
+    const existingToken = this.token
     if (
-      this.token &&
-      Date.now() < this._tokenExpiresOn &&
+      existingToken &&
+      Date.now() < (this._tokenExpiresOn ?? 0) &&
       this._tokenRequestDetails?.clientId === auth?.clientId &&
       this._tokenRequestDetails?.clientSecret === auth?.clientSecret &&
       this._tokenRequestDetails?.scope === auth?.scope
     ) {
       this.debug(`Using existing access token.`)
-      return this.token
+      return existingToken
     }
 
     this.debug(`Fetching new access token.`)
@@ -683,7 +697,7 @@ export function isAccessTokenAuth(
  * @returns {boolean} True if the auth configuration is client ID and secret auth, false otherwise.
  */
 export function isClientIdSecretAuth(
-  auth: NextDrupalAuth
+  auth: NextDrupalAuth | undefined
 ): auth is NextDrupalAuthClientIdSecret {
   return (
     (auth as NextDrupalAuthClientIdSecret)?.clientId !== undefined &&

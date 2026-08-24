@@ -21,6 +21,9 @@ export async function enableDraftMode(
 
   const searchParams = request.nextUrl.searchParams
   const path = searchParams.get("path")
+  if (!path) {
+    throw new Error("Field 'path' is missing.")
+  }
 
   const cookieStore = await cookies()
   // Enable Draft Mode by setting the cookie
