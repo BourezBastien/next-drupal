@@ -3,6 +3,7 @@
 namespace Drupal\next\Entity;
 
 use Drupal\Core\Config\Entity\ConfigEntityBase;
+use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\next\Plugin\RevalidatorInterface;
 use Drupal\next\Plugin\SiteResolverInterface;
 use Drupal\next\RevalidatorPluginCollection;
@@ -287,6 +288,26 @@ class NextEntityTypeConfig extends ConfigEntityBase implements NextEntityTypeCon
    */
   protected function revalidatorPluginManager() {
     return \Drupal::service('plugin.manager.next.revalidator');
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+
+    // Entity rendering depends on this configuration (draft mode, preview),
+    // so cached renderings of the affected entities must be discarded.
+    \Drupal::service('cache_tags.invalidator')->invalidateTags(['rendered']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function postDelete(EntityStorageInterface $storage, array $entities) {
+    parent::postDelete($storage, $entities);
+
+    \Drupal::service('cache_tags.invalidator')->invalidateTags(['rendered']);
   }
 
 }
