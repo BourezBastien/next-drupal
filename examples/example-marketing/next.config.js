@@ -5,7 +5,9 @@ module.exports = {
     defaultLocale: "en",
   },
   images: {
-    domains: [process.env.NEXT_IMAGE_DOMAIN],
+    domains: process.env.NEXT_IMAGE_DOMAIN
+      ? [process.env.NEXT_IMAGE_DOMAIN]
+      : [],
   },
   async rewrites() {
     return [

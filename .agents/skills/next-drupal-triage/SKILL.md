@@ -146,7 +146,12 @@ mergeable ones likely obsolete: #67, #306, #425, #446, #491.
 #695 (sequential revalidations suspended per site: once a site's request fails, further paths skip it instead of stacking timeouts, with an explicit warning — kernel-tested),
 #619 (getAccessToken now supports the password grant: pass { username, password } with client credentials configured on the client; user tokens are never cached — jest-tested),
 #652 (Generate secret buttons on the next_site form fill the preview and revalidate secret fields with Crypt::randomBytesBase64(32), skipping validation and rebuilding — kernel-tested),
-#595 (roadmap question: answered by upstream issue #692 — closed as duplicate).
+#595 (roadmap question: answered by upstream issue #692 — closed as duplicate),
+#729 (duplicated subdirectory in image paths: absoluteUrl/absoluteURL in the basic starter and the umami example no longer duplicate the base path when Drupal already returns it — verified against the reported scenario),
+#732 (example-marketing build: domhandler root import fixed and images.domains falls back to an empty array — remaining deprecations belong to the examples modernization backlog),
+#699 (single sign-on question: FAQ entry explaining the sessions stay separate),
+#713 (dependabot tanstack bump: superseded by #714 — folded into the dev-dependencies modernization project),
+#727 (preview not visible: draft mode is opt-in per entity type — configuration, answered in the issue with screenshots).
 
 Already resolved by adopted/other work (no further action): #148 (preview alerts already use a plain <a>, fix from the issue thread applied upstream), #740 (flaky coverage — Node bug mitigated by the .nvmrc v18.19 pin, referenced in .nvmrc), #838 (v1.6 menu link already correct), #581 (ESM + sideEffects:false already shipped), #746 (fixed by adopted PR #747),
 #589 (permission list incl. View all revisions already in the draft-mode guide),

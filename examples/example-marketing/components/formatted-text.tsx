@@ -1,6 +1,6 @@
 import Image from "next/image"
 import { HTMLReactParserOptions, domToReact } from "html-react-parser"
-import { Element } from "domhandler/lib/node"
+import { Element } from "domhandler"
 import parse from "html-react-parser"
 
 import { isRelative } from "lib/utils/is-relative"
