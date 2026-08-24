@@ -1560,6 +1560,40 @@ describe("translatePath()", () => {
     expect(path).toBeNull()
   })
 
+  test("forwards the request host when the host option is given", async () => {
+    const drupal = new NextDrupal(BASE_URL)
+
+    const fetchSpy = spyOnFetch({
+      status: 200,
+      responseBody: mocks.resources.translatePath.ok,
+    })
+
+    await drupal.translatePath("/recipes/deep-mediterranean-quiche", {
+      host: "example.com:3000",
+    })
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      expect.stringContaining("host=example.com"),
+      expect.anything()
+    )
+  })
+
+  test("does not forward a host by default", async () => {
+    const drupal = new NextDrupal(BASE_URL)
+
+    const fetchSpy = spyOnFetch({
+      status: 200,
+      responseBody: mocks.resources.translatePath.ok,
+    })
+
+    await drupal.translatePath("/recipes/deep-mediterranean-quiche")
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      expect.not.stringContaining("host="),
+      expect.anything()
+    )
+  })
+
   test("throws an error on server error", async () => {
     const drupal = new NextDrupal(BASE_URL)
 
