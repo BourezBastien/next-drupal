@@ -170,7 +170,7 @@ class SimpleOauthPreviewUrlGeneratorTest extends KernelTestBase {
       [
         [
           'path' => '/node/1',
-          'timestamp' => strtotime('now'),
+          'timestamp' => strtotime('60 seconds'),
         ],
         "Field 'secret' is missing",
       ],
