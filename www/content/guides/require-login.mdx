@@ -1,0 +1,28 @@
+---
+title: Require Login
+excerpt: Protect the Drupal backend with the require_login module.
+---
+
+By default, a Drupal backend serving a Next.js frontend is publicly reachable. The [require_login](https://www.drupal.org/project/require_login) module redirects all unauthenticated visitors to the login page — besides the security benefit, this also prevents search engines from indexing the backend pages that mirror the frontend.
+
+## Installation
+
+```sh
+composer require drupal/require_login
+drush en require_login
+```
+
+## Configuration
+
+Configure the module at `/admin/config/people/require_login` to redirect unauthenticated visitors — including on 403 and 404 pages — to the login page, and add the endpoints the frontend and the next module rely on to the ignored paths:
+
+```
+/jsonapi
+/jsonapi/*
+/router/translate-path
+/next/preview-url
+/oauth/*
+/subrequests/*
+```
+
+Without these exclusions the Next.js site can not fetch content, resolve paths, authenticate or generate preview URLs.

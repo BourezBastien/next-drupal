@@ -53,6 +53,10 @@ export const guidesConfig: GuidesConfig = {
           title: "Filter by Site",
           href: "/guides/filter-by-site",
         },
+        {
+          title: "Require Login",
+          href: "/guides/require-login",
+        },
       ],
     },
   ],
