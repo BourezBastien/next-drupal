@@ -506,7 +506,7 @@ export class NextDrupalBase {
   /**
    * Retrieve an access token.
    *
-   * @param {NextDrupalAuthClientIdSecret} clientIdSecret The client ID and secret.
+   * @param {NextDrupalAuthClientIdSecret | NextDrupalAuthUsernamePassword} clientIdSecret Client credentials, or a username and password to fetch a user token through the password grant.
    * @returns {Promise<AccessToken>} The access token.
    * @remarks
    * If options is not provided, `DrupalClient` will use the `clientId` and `clientSecret` configured in `auth`.
@@ -519,18 +519,37 @@ export class NextDrupalBase {
    * ```
    */
   async getAccessToken(
-    clientIdSecret?: NextDrupalAuthClientIdSecret
+    clientIdSecret?:
+      | NextDrupalAuthClientIdSecret
+      | NextDrupalAuthUsernamePassword
   ): Promise<AccessToken> {
     if (this.accessToken) {
       return this.accessToken
     }
 
     let auth: NextDrupalAuthClientIdSecret
+    // Non-null for the password grant: fetch a token on behalf of a user
+    // instead of the machine client_credentials grant.
+    let grantBody: URLSearchParams | null = null
     if (isClientIdSecretAuth(clientIdSecret)) {
       auth = {
         url: DEFAULT_AUTH_URL,
         ...clientIdSecret,
       }
+    } else if (isBasicAuth(clientIdSecret)) {
+      // The password grant requires the OAuth consumer credentials, which
+      // come from the client configuration.
+      if (!isClientIdSecretAuth(this.auth)) {
+        throw new Error(
+          "The password grant requires the client to be configured with clientId and clientSecret. See https://next-drupal.org/docs/client/auth"
+        )
+      }
+      auth = { ...this.auth }
+      grantBody = new URLSearchParams({
+        grant_type: "password",
+        username: clientIdSecret.username,
+        password: clientIdSecret.password,
+      })
     } else if (isClientIdSecretAuth(this.auth)) {
       auth = { ...this.auth }
     } else if (typeof this.auth === "undefined") {
@@ -545,10 +564,12 @@ export class NextDrupalBase {
 
     const url = this.buildUrl(auth.url ?? DEFAULT_AUTH_URL)
 
-    // Ensure that the unexpired token was using the same scope and client
-    // credentials as the current request before re-using it.
+    // User tokens must never be cached and shared across requests: only the
+    // machine client_credentials grant reuses an unexpired token.
+    const isPasswordGrant = grantBody !== null
     const existingToken = this.token
     if (
+      !isPasswordGrant &&
       existingToken &&
       Date.now() < (this._tokenExpiresOn ?? 0) &&
       this._tokenRequestDetails?.clientId === auth?.clientId &&
@@ -566,7 +587,8 @@ export class NextDrupalBase {
       username: auth.clientId,
       password: auth.clientSecret,
     }
-    const body = new URLSearchParams({ grant_type: "client_credentials" })
+    const body =
+      grantBody ?? new URLSearchParams({ grant_type: "client_credentials" })
 
     if (auth?.scope) {
       body.set("scope", auth.scope)
@@ -591,9 +613,10 @@ export class NextDrupalBase {
 
     const result: AccessToken = await response.json()
 
-    this.token = result
-
-    this._tokenRequestDetails = auth
+    if (!isPasswordGrant) {
+      this.token = result
+      this._tokenRequestDetails = auth
+    }
 
     return result
   }
@@ -707,7 +730,7 @@ export class NextDrupalBase {
  * @returns {boolean} True if the auth configuration is basic auth, false otherwise.
  */
 export function isBasicAuth(
-  auth: NextDrupalAuth
+  auth: NextDrupalAuth | undefined
 ): auth is NextDrupalAuthUsernamePassword {
   return (
     (auth as NextDrupalAuthUsernamePassword)?.username !== undefined &&
