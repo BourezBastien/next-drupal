@@ -14,7 +14,17 @@ class NextTestsSeedTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['filter', 'menu_link_content', 'link', 'node', 'path', 'path_alias', 'system', 'text', 'user'];
+  protected static $modules = [
+    'filter',
+    'link',
+    'menu_link_content',
+    'node',
+    'path',
+    'path_alias',
+    'system',
+    'text',
+    'user',
+  ];
 
   /**
    * {@inheritdoc}
