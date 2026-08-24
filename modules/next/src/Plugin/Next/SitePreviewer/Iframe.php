@@ -163,6 +163,17 @@ class Iframe extends ConfigurableSitePreviewerBase implements ContainerFactoryPl
 
     $preview_url = $site->getPreviewUrlForEntity($entity);
 
+    // No URL can be generated (e.g. unpublished content for users without
+    // preview access). Render a notice instead of fataling on a null URL.
+    if (!$preview_url) {
+      $build['notice'] = [
+        '#type' => 'html_tag',
+        '#tag' => 'p',
+        '#value' => $this->t('No preview URL is available for this entity.'),
+      ];
+      return $build;
+    }
+
     $build['toolbar'] = [
       '#prefix' => '<div class="next-site-preview-toolbar">',
       '#suffix' => '</div>',

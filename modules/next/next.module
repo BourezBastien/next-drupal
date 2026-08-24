@@ -95,3 +95,24 @@ function next_entity_translation_delete(EntityInterface $translation) {
   $event = EntityActionEvent::createFromEntity($translation, EntityActionEventInterface::DELETE_ACTION);
   \Drupal::service('next.entity_action_event_dispatcher')->addEvent($event);
 }
+
+/**
+ * Implements hook_entity_operation().
+ */
+function next_entity_operation(EntityInterface $entity) {
+  $operations = [];
+
+  /** @var \Drupal\next\NextEntityTypeManagerInterface $next_entity_type_manager */
+  $next_entity_type_manager = \Drupal::service('next.entity_type.manager');
+  if ($next_entity_type_manager->getConfigForEntityType($entity->getEntityTypeId(), $entity->bundle())) {
+    // The canonical route renders the site preview for configured entity
+    // types, giving editors a direct preview link from listings.
+    $operations['site_preview'] = [
+      'title' => t('Site preview'),
+      'url' => $entity->toUrl('canonical'),
+      'weight' => 30,
+    ];
+  }
+
+  return $operations;
+}

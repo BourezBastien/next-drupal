@@ -79,6 +79,21 @@ class NextSiteTest extends KernelTestBase {
   }
 
   /**
+   * @covers ::getPreviewUrlForEntity
+   */
+  public function testGetPreviewUrlForEntityReturnsNullForUnpublished() {
+    // Users with no additional roles get the live URL, which is NULL for
+    // unpublished content. The method must return NULL instead of fataling
+    // with a TypeError.
+    $this->setCurrentUser($this->createUser());
+
+    $node = $this->createNode([
+      'status' => 0,
+    ]);
+    $this->assertNull($this->nextSite->getPreviewUrlForEntity($node));
+  }
+
+  /**
    * @covers ::getBaseUrl
    * @covers ::getPreviewUrl
    * @covers ::getPreviewSecret

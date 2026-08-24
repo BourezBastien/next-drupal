@@ -93,7 +93,7 @@ mergeable ones likely obsolete: #67, #306, #425, #446, #491.
   token (build workers + runtime instances). Expected behavior; a shared token
   cache would be an opt-in feature, not a bug fix.
 
-## Resolved on the fork (status as of session 18)
+## Resolved on the fork (status as of session 19)
 
 #854, #499, #874, #912, #861, #855, #859, #847, #911, #862, #848, #850, #686, #799, #681, #772, #722, #779, #155, #346, #650, #793, #813, #818, #246, #533, #783 (docs ddev/consommateur), #806 (numérotation umami + patches déjà corrigés), #611 (pattern next-auth preview), #653 (base_url rendered as a link in the next_site listing, kernel-tested), #696 (Path revalidator logs non-200 responses as warnings, kernel-tested), #615 (consumer collection path resolved via Url::fromRoute with a safe fallback, kernel-tested), #532 + #535 (version added to modules/next/package.json — no more yarn workspace warning; the workspace package is renamed next-drupal-module because the original "next" name shadowed the Next.js framework once versioned), #422 + #493 (preview secret expiration documented in known-issues.mdx: refresh the preview or raise secret_expiration),
 #325 (translatePath now sends Accept: application/json — the decoupled_router route requires the json format and older Drupal versions fail to negotiate application/vnd.api+json to it; jest-tested),
@@ -119,7 +119,9 @@ mergeable ones likely obsolete: #67, #306, #425, #446, #491.
 #286 (default locale prefix: workaround locked in with a test — omitting defaultLocale keeps the locale prefix for prefixed-default Drupal setups; an explicit configuration option remains a deferred enhancement, direction acknowledged upstream),
 #135 (React Native: the 2.x core client has no runtime dependency on Next.js — only draft.ts and use-menu import next/*, and they are separate entry points; FAQ entry added),
 #262 (yarn commands: the quick-start and umami guide already show npm and yarn alternatives),
-#263 (Docker: FAQ entry added — separate PHP and Node containers, NEXT_PUBLIC_DRUPAL_BASE_URL wiring, ddev quick-start pointer).
+#263 (Docker: FAQ entry added — separate PHP and Node containers, NEXT_PUBLIC_DRUPAL_BASE_URL wiring, ddev quick-start pointer),
+#508 (unpublished node preview fatal: getPreviewUrlForEntity is now nullable (?Url) and the Iframe site previewer renders a translatable notice instead of a TypeError — kernel-tested),
+#463 (site preview as an entity operation: next_entity_operation adds a Site preview link to listings for configured entity types — kernel-tested).
 
 Already resolved by adopted/other work (no further action): #148 (preview alerts already use a plain <a>, fix from the issue thread applied upstream), #740 (flaky coverage — Node bug mitigated by the .nvmrc v18.19 pin, referenced in .nvmrc), #838 (v1.6 menu link already correct), #581 (ESM + sideEffects:false already shipped), #746 (fixed by adopted PR #747),
 #589 (permission list incl. View all revisions already in the draft-mode guide),
@@ -184,7 +186,26 @@ delivery mechanism. Needs its own design pass),
 #234 (usage catalog: community action upstream — maintainer planned a
 showcase; nothing to do in the fork),
 #321 (hacktoberfest topic: GitHub repository topic, maintainer action
-upstream; not applicable to the fork).
+upstream; not applicable to the fork),
+#64 (site filtering from Drupal at the JSON:API level: deferred — identifying
+the calling site requires a trusted signal (header/secret per site) plus
+query alteration; the filter-by-site guide covers the frontend side),
+#279 (same alias across microsites: by-design question — aliases are global
+in Drupal; the pattern is per-site alias prefixes plus a rewrite, no library
+change),
+#461 (Workspaces integration: deferred — #876 added the workspace id to
+NextSite, but previewing the active editor workspace requires forwarding the
+workspace through the preview URL; design needed),
+#507 (skip revalidation: per-type skip already exists (select None);
+a global CLI/batch skip switch is a deferred enhancement).
+
+## Process (from session 19, Bastien's directive)
+
+Process open issues in ASCENDING numeric order (#1 → latest) instead of
+thematic waves: it surfaces related problems early and keeps the sweep
+auditable. Every issue gets a decision: fixed (with gates), documented,
+classified, or explicitly deferred with a rationale. Resume from the lowest
+open unprocessed number — see the ordered list in docs/PLAN.md.
 Adopted upstream PRs: #865, #790, #791, #842, #904, #853, #844, #876, #856
 (adapted as `host` option), #860 (#846 was already fixed upstream by #887).
 
