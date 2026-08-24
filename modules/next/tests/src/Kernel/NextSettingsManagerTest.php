@@ -65,6 +65,15 @@ class NextSettingsManagerTest extends KernelTestBase {
 
     $this->assertInstanceOf(Iframe::class, $this->nextSettingsManager->getSitePreviewer());
     $this->assertInstanceOf(SimpleOauth::class, $this->nextSettingsManager->getPreviewUrlGenerator());
+
+    // Clearing the preview url generator disables draft mode instead of
+    // throwing, and unblocks module uninstall. (#346)
+    $this->container->get('config.factory')
+      ->getEditable('next.settings')
+      ->set('preview_url_generator', '')
+      ->clear('preview_url_generator_configuration')
+      ->save();
+    $this->assertNull($this->nextSettingsManager->getPreviewUrlGenerator());
   }
 
 }

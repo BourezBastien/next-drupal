@@ -109,6 +109,11 @@ class NextSettingsManager implements NextSettingsManagerInterface {
   public function getPreviewUrlGenerator(): ?PreviewUrlGeneratorInterface {
     $preview_url_generator_id = $this->get('preview_url_generator');
 
+    // An empty plugin id means draft mode is disabled.
+    if (!$preview_url_generator_id) {
+      return NULL;
+    }
+
     try {
       /** @var \Drupal\next\Plugin\PreviewUrlGeneratorInterface $preview_url_generator */
       $preview_url_generator = $this->previewUrlGeneratorManager->createInstance($preview_url_generator_id, $this->get('preview_url_generator_configuration') ?? []);

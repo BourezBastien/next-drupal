@@ -79,7 +79,11 @@ class NextSettingsForm extends ConfigFormBase {
       '#type' => 'select',
       '#options' => array_column($this->previewUrlGeneratorManager->getDefinitions(), 'label', 'id'),
       '#default_value' => $config->get('preview_url_generator'),
-      '#required' => TRUE,
+      // Optional: draft mode can be disabled by clearing the plugin, which
+      // also unblocks uninstalling the module. (#346)
+      '#required' => FALSE,
+      '#empty_value' => '',
+      '#empty_option' => $this->t('- None -'),
       '#limit_validation_errors' => [['preview_url_generator']],
       '#submit' => ['::submitPreviewUrlGenerator'],
       '#executes_submit_callback' => TRUE,
@@ -96,7 +100,14 @@ class NextSettingsForm extends ConfigFormBase {
       '#suffix' => '</div>',
     ];
 
-    if (($preview_url_generator_id = $form_state->getValue('preview_url_generator')) || ($preview_url_generator_id = $config->get('preview_url_generator'))) {
+    // An explicitly submitted empty value means draft mode is disabled;
+    // fall back to the stored config only when the element was not
+    // submitted yet.
+    $preview_url_generator_id = $form_state->getValue('preview_url_generator');
+    if ($preview_url_generator_id === NULL) {
+      $preview_url_generator_id = $config->get('preview_url_generator');
+    }
+    if ($preview_url_generator_id) {
       $preview_url_generator = $this->previewUrlGeneratorManager->createInstance($preview_url_generator_id, $config->get('preview_url_generator_configuration') ?: []);
       if ($preview_url_generator instanceof ConfigurablePreviewUrlGeneratorInterface) {
         $subform_state = SubformState::createForSubform($form['preview_url_generator_container']['settings_container'], $form, $form_state);

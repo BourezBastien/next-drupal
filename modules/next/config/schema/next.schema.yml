@@ -138,3 +138,9 @@ next.preview_url_generator.configuration.simple_oauth:
     secret_expiration:
       type: integer
       label: 'Secret expiration'
+
+# Fallback so the configuration can be saved (and draft mode disabled)
+# while the preview url generator is empty. (#346)
+next.preview_url_generator.configuration.*:
+  type: mapping
+  label: 'Preview url generator configuration'
