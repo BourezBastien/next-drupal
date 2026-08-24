@@ -1737,3 +1737,59 @@ describe("translatePath()", () => {
     )
   })
 })
+
+describe("createResource()", () => {
+  test("sends to-many relationship bodies as-is", async () => {
+    const drupal = new NextDrupal(BASE_URL)
+
+    const fetchSpy = spyOnFetch({
+      status: 200,
+      responseBody: {
+        data: {
+          type: "node--article",
+          id: "3330a418-51db-4b52-8a10-1f04df8e67d9",
+          attributes: {
+            title: "TEST New article",
+          },
+        },
+      },
+    })
+
+    await drupal.createResource(
+      "node--article",
+      {
+        data: {
+          attributes: {
+            title: "TEST New article",
+          },
+          relationships: {
+            field_tags: {
+              data: [
+                {
+                  type: "taxonomy_term--tags",
+                  id: "0e8a1d91-7b67-4143-9a47-c849775cb9f9",
+                },
+                {
+                  type: "taxonomy_term--tags",
+                  id: "4c68a2f2-6c31-4263-af3b-63b6c0ba35d2",
+                },
+              ],
+            },
+          },
+        },
+      },
+      {
+        deserialize: false,
+        withAuth: false,
+      }
+    )
+
+    const init = fetchSpy.mock.calls[0][1]
+    const body = JSON.parse(init.body)
+
+    expect(body.data.relationships.field_tags.data).toHaveLength(2)
+    expect(body.data.relationships.field_tags.data[0].id).toBe(
+      "0e8a1d91-7b67-4143-9a47-c849775cb9f9"
+    )
+  })
+})
