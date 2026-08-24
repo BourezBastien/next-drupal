@@ -46,8 +46,8 @@ class Path extends ConfigurableRevalidatorBase implements RevalidatorInterface {
       '#type' => 'textarea',
       '#title' => $this->t('Additional paths'),
       '#default_value' => $this->configuration['additional_paths'],
-      '#description' => $this->t('Additional paths to revalidate on entity update. Enter one path per line. Example %example.', [
-        '%example' => '/blog',
+      '#description' => $this->t('Additional paths to revalidate on entity update. Enter one path per line. Entity tokens are replaced, e.g. %example.', [
+        '%example' => '/redirects[node:url:path]',
       ]),
     ];
 
@@ -93,7 +93,18 @@ class Path extends ConfigurableRevalidatorBase implements RevalidatorInterface {
       }
     }
     if (!empty($this->configuration['additional_paths'])) {
-      $paths = array_merge($paths, array_map('trim', explode("\n", $this->configuration['additional_paths'])));
+      $additional_paths = array_map('trim', explode("\n", $this->configuration['additional_paths']));
+      $additional_paths = array_filter($additional_paths);
+
+      // Replace entity tokens (e.g. [node:url:path]) so paths derived from
+      // the entity — like the source of a redirect — can be revalidated.
+      $entity = $event->getEntity();
+      $token_data = [$entity->getEntityTypeId() => $entity];
+      foreach ($additional_paths as $key => $additional_path) {
+        $additional_paths[$key] = $this->token->replace($additional_path, $token_data);
+      }
+
+      $paths = array_merge($paths, $additional_paths);
     }
 
     if (!count($paths)) {

@@ -142,6 +142,45 @@ class PathRevalidatorTest extends KernelTestBase {
   /**
    * @covers ::revalidate
    */
+  public function testRevalidateTokensInAdditionalPaths() {
+    /** @var \GuzzleHttp\ClientInterface $client */
+    $client = $this->prophesize(ClientInterface::class);
+    $this->container->set('http_client', $client->reveal());
+
+    NextSite::create([
+      'id' => 'blog',
+      'revalidate_url' => 'http://blog.com/api/revalidate',
+    ])->save();
+
+    NextEntityTypeConfig::create([
+      'id' => 'node.page',
+      'site_resolver' => 'site_selector',
+      'configuration' => [
+        'sites' => [
+          'blog' => 'blog',
+        ],
+      ],
+      'revalidator' => 'path',
+      'revalidator_configuration' => [
+        'revalidate_page' => FALSE,
+        'additional_paths' => "/node/[node:nid]\n/static-path",
+      ],
+    ])->save();
+
+    $client->request('GET', 'http://blog.com/api/revalidate?path=/node/1')
+      ->shouldBeCalled()
+      ->willReturn(new GuzzleResponse());
+    $client->request('GET', 'http://blog.com/api/revalidate?path=/static-path')
+      ->shouldBeCalled()
+      ->willReturn(new GuzzleResponse());
+
+    $this->createNode(['type' => 'page']);
+    $this->container->get('kernel')->terminate(Request::create('/'), new Response());
+  }
+
+  /**
+   * @covers ::revalidate
+   */
   public function testRevalidateFailureIsLogged() {
     /** @var \GuzzleHttp\ClientInterface $client */
     $client = $this->prophesize(ClientInterface::class);

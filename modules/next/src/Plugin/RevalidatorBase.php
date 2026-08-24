@@ -5,6 +5,7 @@ namespace Drupal\next\Plugin;
 use Drupal\Core\Logger\LoggerChannelInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginBase;
+use Drupal\Core\Utility\Token;
 use Drupal\next\NextSettingsManagerInterface;
 use GuzzleHttp\ClientInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -36,6 +37,13 @@ abstract class RevalidatorBase extends PluginBase implements RevalidatorInterfac
   protected NextSettingsManagerInterface $nextSettingsManager;
 
   /**
+   * The token service.
+   *
+   * @var \Drupal\Core\Utility\Token
+   */
+  protected Token $token;
+
+  /**
    * RevalidatorBase constructor.
    *
    * @param array $configuration
@@ -50,19 +58,22 @@ abstract class RevalidatorBase extends PluginBase implements RevalidatorInterfac
    *   The http client.
    * @param \Drupal\Core\Logger\LoggerChannelInterface $logger
    *   The logger.
+   * @param \Drupal\Core\Utility\Token|null $token
+   *   The token service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, NextSettingsManagerInterface $next_settings_manager, ClientInterface $http_client, LoggerChannelInterface $logger) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, NextSettingsManagerInterface $next_settings_manager, ClientInterface $http_client, LoggerChannelInterface $logger, ?Token $token = NULL) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->httpClient = $http_client;
     $this->logger = $logger;
     $this->nextSettingsManager = $next_settings_manager;
+    $this->token = $token ?? \Drupal::token();
   }
 
   /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
-    return new static($configuration, $plugin_id, $plugin_definition, $container->get('next.settings.manager'), $container->get('http_client'), $container->get('logger.channel.next'));
+    return new static($configuration, $plugin_id, $plugin_definition, $container->get('next.settings.manager'), $container->get('http_client'), $container->get('logger.channel.next'), $container->get('token'));
   }
 
   /**
