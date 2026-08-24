@@ -5,10 +5,10 @@
 
 ---
 
-## État d'avancement (mis à jour 2026-08-24, session 3)
+## État d'avancement (mis à jour 2026-08-24, session 8)
 
-### Issues GitHub résolues ou classées avec justification (31)
-#854 (locale prefix), #499 (type promote), #874 (meta relationships), #912 (sous-répertoire), #861 (locale + cache tags), #855 (debug sites vides), #859 (lien live révisions), #847 (docs preview→draft), #911 (revalider la source des redirects, avec test kernel), #862 + #848 (docs du revalidator cache_tag), #850 (pagination des chemins statiques, avec tests), #686 (types `drupal_internal__*id` en number), #799 (`credentials` seulement si le runtime le supporte, avec test), #681 (contrainte du générique de `getMenu` — réglée par le retypage `T extends DrupalMenuItem`), #772 (starter : notFound() au lieu de throw → la revalidation à la dépublication réussit), #722 (option withMeta sur getResourceCollection → {results, meta, links} avec type DrupalResourceCollection), #779 (l'événement d'entité porte la langue → le chemin de la traduction supprimée est revalidé, test kernel), #155 (injection automatique de default_langcode dans les sparse fieldsets from-context, avec test), #346 (plugin de génération d'URL de preview effaçable → désinstallation possible, avec schema fallback et test), #650 (docs : flag extra.enable-patching requis par composer-patches 2.x), #793 (arbre de menu toujours retourné → sérialisable getStaticProps), #813 (docs : avertissement withAuth sur pages publiques + bypass access), #818 (handler preview v1 : erreurs Drupal propagées avec logging DRUPAL_DEBUG), #246 (invalidation du tag rendered à la sauvegarde/suppression des configs d'entités), #533 (TESTING.md : recettes locales unitaires documentées), #783 (docs quick-start : ddev + consommateur), #806 (guide umami : numérotation corrigée, auth déjà documentée en fin de guide), #611 (pattern next-auth pour preview authentifié). Déjà résolues sans action : #746, #589, #838 (lien v1.6 correct), #581 (ESM + sideEffects:false déjà en place), #148 (alertes preview déjà en <a> simple), #740 (couverture instable — bug Node, atténué par le pin .nvmrc). #649 (limite spec JSON:API, classée) et #682 (needs repro avec output:export, parkée).
+### Issues GitHub résolues ou classées avec justification (34)
+#854 (locale prefix), #499 (type promote), #874 (meta relationships), #912 (sous-répertoire), #861 (locale + cache tags), #855 (debug sites vides), #859 (lien live révisions), #847 (docs preview→draft), #911 (revalider la source des redirects, avec test kernel), #862 + #848 (docs du revalidator cache_tag), #850 (pagination des chemins statiques, avec tests), #686 (types `drupal_internal__*id` en number), #799 (`credentials` seulement si le runtime le supporte, avec test), #681 (contrainte du générique de `getMenu` — réglée par le retypage `T extends DrupalMenuItem`), #772 (starter : notFound() au lieu de throw → la revalidation à la dépublication réussit), #722 (option withMeta sur getResourceCollection → {results, meta, links} avec type DrupalResourceCollection), #779 (l'événement d'entité porte la langue → le chemin de la traduction supprimée est revalidé, test kernel), #155 (injection automatique de default_langcode dans les sparse fieldsets from-context, avec test), #346 (plugin de génération d'URL de preview effaçable → désinstallation possible, avec schema fallback et test), #650 (docs : flag extra.enable-patching requis par composer-patches 2.x), #793 (arbre de menu toujours retourné → sérialisable getStaticProps), #813 (docs : avertissement withAuth sur pages publiques + bypass access), #818 (handler preview v1 : erreurs Drupal propagées avec logging DRUPAL_DEBUG), #246 (invalidation du tag rendered à la sauvegarde/suppression des configs d'entités), #533 (TESTING.md : recettes locales unitaires documentées), #783 (docs quick-start : ddev + consommateur), #806 (guide umami : numérotation corrigée, auth déjà documentée en fin de guide), #611 (pattern next-auth pour preview authentifié). Déjà résolues sans action : #746, #589, #838 (lien v1.6 correct), #581 (ESM + sideEffects:false déjà en place), #148 (alertes preview déjà en <a> simple), #740 (couverture instable — bug Node, atténué par le pin .nvmrc). #649 (limite spec JSON:API, classée) et #682 (needs repro avec output:export, parkée). Session 8 : #653 (base_url cliquable dans la liste des sites, avec tests kernel), #696 (échecs de revalidation non-200 désormais logués en warning dans le revalidator Path, avec test), #93 (classée déjà-résolue : `getStaticPathsFromContext` parallélise déjà types ET locales via `Promise.all`).
 
 ### PR upstream adoptées (avec attribution Co-authored-by)
 #865, #790, #791, #842, #904, #853 (durci + test SSG), #844 (durci garde null), #876, #856 (réimplémenté en option `host` explicite), #860. #846 déjà résolue en amont (#887). Dependabot : qs → 6.15.3 et nanoid → 3.3.18 appliqués nous-mêmes (remplace #908, #929).
@@ -16,10 +16,14 @@
 ### Bugs découverts et corrigés au passage
 - `EntityActionEventDispatcher::destruct()` ne vidait pas sa file → revalidations HTTP dupliquées (processus longs).
 - Schéma de config manquant pour le revalidator `cache_tag` (impossible de sauver la config en strict).
-- Test instable `SimpleOauthPreviewUrlGeneratorTest` (timestamp `now` expirant à l'exécution).
+- Test instable `SimpleOauthPreviewUrlGeneratorTest` (timestamp `now` expirant à l'exécution) — **fix définitif session 8** : marges ±3600 s ; c'est ce test qui faisait échouer la matrice CI **Drupal 11.2** (runner plus lent : >90 s entre l'évaluation du data provider et l'exécution, la fenêtre d'expiration de 30 s tombait).
 
-### Phase 0 — TERMINÉE (session 7)
+### Phase 0 — TERMINÉE (session 8)
 - ✅ ESLint durci : no-unused-vars error + import/no-cycle sur packages/next-drupal/src, frontière no-restricted-imports next/* sur next-drupal-base.ts (draft.ts exempté légitimement).
+- ✅ **Zéro `any` dans `packages/next-drupal/src`** (8 occurrences converties en `unknown`/génériques explicites) + règle `@typescript-eslint/no-explicit-any: error` activée sur ce périmètre. Au passage : type guard `hasQueryObject` typé dans `buildUrl` (l'ancien code appelait `getQueryObject()` sur un index-signature `any`), générique `JsonApiResourceWithPath` explicite dans `getResourcePreviewUrl`.
+- ✅ `turbo.json` : `globalEnv` déclarée (variables DRUPAL_*/NEXT_PUBLIC_* qui affectent les builds → clés de cache correctes).
+- ✅ Fork hygiène CI : `next-drupal.yml` (tests d'intégration live avec secrets Chapter Three) ne s'exécute sur push main que sur le repo upstream ; la matrice `next.yml` (D10.5/D10.6/D11.2 × PHP) tourne sur le fork avec le fix D11.2 ci-dessus.
+- Référence locale : sources du core Drupal disponibles hors-ligne (`C:\Users\Bastien\Documents\Projects\core-11.x` et `...\drupal-main`, deux checkouts distincts fournis par Bastien) pour toute question de compatibilité API Drupal 10/11.
 
 ### Phase 0 (historique)
 - ✅ **PHPStan niveau 5** sur `modules/next` (`phpstan.neon`, ignores documentés, vrais bugs corrigés : PHPDoc de collection erroné, type de retour tronqué, `save()` sans return, `accessCheck` déprécié) — intégré à la CI.
@@ -29,7 +33,7 @@
 
 ### Harnais de test local
 - Jest sans Drupal vivant : `cd packages/next-drupal && DRUPAL_BASE_URL=http://localhost DRUPAL_CLIENT_ID=test DRUPAL_CLIENT_SECRET=test npx jest --coverage=false` (référence : 272 passés, 86 échecs réseau préexistants).
-- PHPUnit : projet Drupal 10.6 dans `.phpunit-drupal/` (gitignoré) — voir `.agents/skills/next-drupal-dev/SKILL.md`. 29/29 verts.
+- PHPUnit : projet Drupal 10.6 dans `.phpunit-drupal/` (gitignoré) — voir `.agents/skills/next-drupal-dev/SKILL.md`. 35/35 verts.
 - Le dossier `drupal/` du dépôt est une install D9 obsolète (copie 1.x du module) : inutilisable pour les tests.
 
 ### E2E — état des lieux (Cypress, pas Playwright)
