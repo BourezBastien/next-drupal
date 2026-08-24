@@ -109,7 +109,7 @@ class NextEntityTypeConfigForm extends EntityForm {
 
     $form['site_resolver'] = [
       '#title' => $this->t('Plugin'),
-      '#description' => $this->t('Select a plugin to use when validating the draft url for this entity type.'),
+      '#description' => $this->t('Select a plugin to resolve the Next.js sites for this entity type. It is used by both draft mode and on-demand revalidation.'),
       '#type' => 'select',
       '#options' => array_column($this->siteResolverManager->getDefinitions(), 'label', 'id'),
       '#default_value' => $entity->getSiteResolver() ? $entity->getSiteResolver()->getId() : NULL,
