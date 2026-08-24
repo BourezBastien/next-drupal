@@ -48,3 +48,6 @@ yarn-error.log*
 .claude/
 .phpunit-drupal/
 test/e2e/next-app/.next/
+
+# Cypress binary cache used by the local e2e pipeline
+.cypress-cache/

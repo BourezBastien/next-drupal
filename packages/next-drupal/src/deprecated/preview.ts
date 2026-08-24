@@ -1,5 +1,6 @@
 import { getResourceByPath } from "./get-resource"
 import type { NextApiRequest, NextApiResponse } from "next"
+import type { JsonApiResourceWithPath } from "../types"
 import type { JsonApiWithLocaleOptions } from "../types/deprecated"
 
 interface PreviewOptions {
@@ -86,7 +87,7 @@ export async function getResourcePreviewUrl(
   slug: string,
   options?: GetResourcePreviewUrlOptions
 ) {
-  const entity = await getResourceByPath(slug, options)
+  const entity = await getResourceByPath<JsonApiResourceWithPath>(slug, options)
 
   if (!entity) {
     return null

@@ -140,7 +140,9 @@ class SimpleOauthPreviewUrlGeneratorTest extends KernelTestBase {
     $preview_url_generator->validate($request);
     $this->expectExceptionMessage('The provided secret is invalid.');
     $query = $preview_url->getOption('query');
-    $query['timestamp'] = strtotime('+60seconds');
+    // Stay far from the 30s expiration window: data providers may be
+    // evaluated long before the test runs on slow CI runners.
+    $query['timestamp'] = time() + 3600;
     $request = Request::create('/', 'POST', [], [], [], [], Json::encode($query));
     $preview_url_generator->validate($request);
 
@@ -170,14 +172,17 @@ class SimpleOauthPreviewUrlGeneratorTest extends KernelTestBase {
       [
         [
           'path' => '/node/1',
-          'timestamp' => strtotime('60 seconds'),
+          // Far in the future: must reach the missing-secret check, not the
+          // expiration check, even on slow CI runners.
+          'timestamp' => time() + 3600,
         ],
         "Field 'secret' is missing",
       ],
       [
         [
           'path' => '/node/1',
-          'timestamp' => strtotime('-60 seconds'),
+          // Far in the past: always expired.
+          'timestamp' => time() - 3600,
           'secret' => 'secret',
         ],
         "The provided secret has expired.",
@@ -185,7 +190,7 @@ class SimpleOauthPreviewUrlGeneratorTest extends KernelTestBase {
       [
         [
           'path' => '/node/1',
-          'timestamp' => strtotime('60 seconds'),
+          'timestamp' => time() + 3600,
           'secret' => 'secret',
         ],
         "",

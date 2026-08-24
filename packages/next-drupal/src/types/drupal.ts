@@ -148,8 +148,7 @@ export interface DrupalUser extends JsonApiResourceWithPath {
   name: string
 }
 
-/* eslint-disable  @typescript-eslint/no-explicit-any */
-export interface DrupalView<T = Record<string, any>[]> {
+export interface DrupalView<T = Record<string, unknown>[]> {
   id: string
   results: T
   meta: JsonApiResponse["meta"]

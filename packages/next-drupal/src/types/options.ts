@@ -61,9 +61,7 @@ export type TranslatePathOptions = {
    */
   host?: string
 }
-// TODO: Properly type this.
 /**
  * JSON:API params such as filter, fields, include or sort.
  */
-/* eslint-disable  @typescript-eslint/no-explicit-any */
-export type JsonApiParams = Record<string, any>
+export type JsonApiParams = Record<string, unknown>
