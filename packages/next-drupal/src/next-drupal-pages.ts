@@ -17,6 +17,7 @@ import type {
   JsonApiResource,
   JsonApiResourceWithPath,
   JsonApiWithAuthOption,
+  JsonApiWithNextFetchOptions,
   JsonDeserializer,
   Locale,
   PathPrefix,
@@ -358,7 +359,7 @@ export class NextDrupalPages extends NextDrupal {
         : {}),
       withAuth:
         this.getAuthFromContextAndOptions(context, options) ?? undefined,
-    } as Parameters<NextDrupalPages["getResourceCollection"]>[1])
+    } as JsonApiOptions & JsonApiWithNextFetchOptions)
   }
 
   /**
