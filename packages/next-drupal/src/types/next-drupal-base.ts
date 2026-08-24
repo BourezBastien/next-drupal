@@ -51,12 +51,16 @@ export type NextDrupalBaseOptions = {
   /**
    * Set the default frontPage.
    *
+   * Pass a string for a single front page, or a record keyed by locale for
+   * multilingual sites (`{ fr: "/accueil", en: "/home" }`). With a record,
+   * the `default` key is the fallback for locales without their own entry.
+   *
    * * **Default value**: `/home`
    * * **Required**: *No*
    *
    * [Documentation](https://next-drupal.org/docs/client/configuration#frontpage)
    */
-  frontPage?: string
+  frontPage?: string | Record<string, string>
 
   /**
    * Set custom headers for the fetcher.

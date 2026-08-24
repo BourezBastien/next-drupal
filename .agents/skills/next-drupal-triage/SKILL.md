@@ -93,7 +93,7 @@ mergeable ones likely obsolete: #67, #306, #425, #446, #491.
   token (build workers + runtime instances). Expected behavior; a shared token
   cache would be an opt-in feature, not a bug fix.
 
-## Resolved on the fork (status as of session 19)
+## Resolved on the fork (status as of session 20)
 
 #854, #499, #874, #912, #861, #855, #859, #847, #911, #862, #848, #850, #686, #799, #681, #772, #722, #779, #155, #346, #650, #793, #813, #818, #246, #533, #783 (docs ddev/consommateur), #806 (numérotation umami + patches déjà corrigés), #611 (pattern next-auth preview), #653 (base_url rendered as a link in the next_site listing, kernel-tested), #696 (Path revalidator logs non-200 responses as warnings, kernel-tested), #615 (consumer collection path resolved via Url::fromRoute with a safe fallback, kernel-tested), #532 + #535 (version added to modules/next/package.json — no more yarn workspace warning; the workspace package is renamed next-drupal-module because the original "next" name shadowed the Next.js framework once versioned), #422 + #493 (preview secret expiration documented in known-issues.mdx: refresh the preview or raise secret_expiration),
 #325 (translatePath now sends Accept: application/json — the decoupled_router route requires the json format and older Drupal versions fail to negotiate application/vnd.api+json to it; jest-tested),
@@ -121,7 +121,11 @@ mergeable ones likely obsolete: #67, #306, #425, #446, #491.
 #262 (yarn commands: the quick-start and umami guide already show npm and yarn alternatives),
 #263 (Docker: FAQ entry added — separate PHP and Node containers, NEXT_PUBLIC_DRUPAL_BASE_URL wiring, ddev quick-start pointer),
 #508 (unpublished node preview fatal: getPreviewUrlForEntity is now nullable (?Url) and the Iframe site previewer renders a translatable notice instead of a TypeError — kernel-tested),
-#463 (site preview as an entity operation: next_entity_operation adds a Site preview link to listings for configured entity types — kernel-tested).
+#463 (site preview as an entity operation: next_entity_operation adds a Site preview link to listings for configured entity types — kernel-tested),
+#158 (frontPage now accepts a per-locale record ({ default, de, en, ... }) with fallback to the default key then /home — jest-tested),
+#162 (media by path requires the /media/{id} access setting — callout added to getResourceByPath docs),
+#277 (Umami guide: Node 18 LTS+ requirement added — non-LTS Node releases fail the next-auth engine check),
+#354 (patches still required: contrib bugs unfixed upstream; docs reference the current 2024 re-rolled decoupled_router patch).
 
 Already resolved by adopted/other work (no further action): #148 (preview alerts already use a plain <a>, fix from the issue thread applied upstream), #740 (flaky coverage — Node bug mitigated by the .nvmrc v18.19 pin, referenced in .nvmrc), #838 (v1.6 menu link already correct), #581 (ESM + sideEffects:false already shipped), #746 (fixed by adopted PR #747),
 #589 (permission list incl. View all revisions already in the draft-mode guide),
@@ -197,7 +201,12 @@ change),
 NextSite, but previewing the active editor workspace requires forwarding the
 workspace through the preview URL; design needed),
 #507 (skip revalidation: per-type skip already exists (select None);
-a global CLI/batch skip switch is a deferred enhancement).
+a global CLI/batch skip switch is a deferred enhancement),
+#338 (search demo down: the example-search-api demo is hosted upstream and
+out of service — nothing actionable in the repo; the search-api guide covers
+the setup),
+#349 (redirects empty: reporter resolved it themselves — the issue was in
+their decoupled_router setup, not in this package).
 
 ## Process (from session 19, Bastien's directive)
 

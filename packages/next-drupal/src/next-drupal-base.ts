@@ -52,7 +52,7 @@ export class NextDrupalBase {
 
   fetcher?: NextDrupalBaseOptions["fetcher"]
 
-  frontPage: string
+  frontPage: string | Record<string, string>
 
   isDebugEnabled: boolean
 
@@ -435,7 +435,7 @@ export class NextDrupalBase {
     if (!segment && !pathPrefix) {
       // If no pathPrefix is given and the segment is empty, then the path
       // should be the homepage.
-      segment = this.frontPage
+      segment = this.resolveFrontPage(locale)
     }
 
     // Ensure the segment starts with a "/" and does not end with a "/".
@@ -450,6 +450,26 @@ export class NextDrupalBase {
       locale,
       defaultLocale,
     })
+  }
+
+  /**
+   * Resolves the front page path for the given locale.
+   *
+   * @param {Locale} locale The locale, when the request carries one.
+   * @returns {string} The front page path.
+   */
+  private resolveFrontPage(locale?: Locale): string {
+    if (typeof this.frontPage === "string") {
+      return this.frontPage
+    }
+
+    // Per-locale front pages: fall back to the "default" key for locales
+    // without their own entry, then to the generic default.
+    if (locale && this.frontPage[locale]) {
+      return this.frontPage[locale]
+    }
+
+    return this.frontPage.default ?? DEFAULT_FRONT_PAGE
   }
 
   /**
