@@ -40,3 +40,25 @@ NEXT_IMAGE_DOMAIN=example
 To start the Next.js development server, run `npm run dev` or `yarn dev`. This starts the development server on `http://localhost:3000`.
 
 Visit [http://localhost:3000](http://localhost:3000) to view the site.
+
+---
+
+## Configure the Next.js site and authentication
+
+Before continuing, configure the Next.js site from the Drupal admin panel
+by navigating to `/admin/config/services/next`. Press **Add Next.js
+site** and follow the instructions.
+
+To generate `DRUPAL_CLIENT_ID` and `DRUPAL_CLIENT_SECRET`, retrieve or
+create a consumer at `/admin/config/services/consumer` and copy its
+**UUID** (client ID) and **Secret** (client secret).
+
+<Callout type="warning">
+
+**Using DDEV?** The Next.js app must reach Drupal through the DDEV
+hostname, not `localhost`. Use the site's DDEV URL (e.g.
+`https://my-drupal.ddev.site`) for `NEXT_PUBLIC_DRUPAL_BASE_URL`, and
+make sure the Next.js origin is allowed by Drupal's CORS/allowed origins
+when previewing.
+
+</Callout>
