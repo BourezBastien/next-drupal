@@ -6,6 +6,7 @@ import {
   mocks,
   spyOnDrupalFetch,
   spyOnFetch,
+  spyOnFetchOnce,
 } from "../utils"
 import type {
   DrupalNode,
@@ -901,6 +902,36 @@ describe("getResourceByPath()", () => {
 })
 
 describe("getResourceCollection()", () => {
+  test("returns meta and links when withMeta is true", async () => {
+    const drupal = new NextDrupal(BASE_URL)
+
+    spyOnFetchOnce({
+      status: 200,
+      responseBody: {
+        data: [
+          {
+            type: "node--article",
+            id: "11111111-1111-1111-1111-111111111111",
+            attributes: { title: "With meta" },
+          },
+        ],
+        meta: { count: 42 },
+        links: { next: { href: `${BASE_URL}/jsonapi/node--article?page=2` } },
+      },
+    })
+
+    const collection = await drupal.getResourceCollection("node--article", {
+      withMeta: true,
+    })
+
+    expect(collection.meta).toEqual({ count: 42 })
+    expect(collection.links).toMatchObject({
+      next: { href: `${BASE_URL}/jsonapi/node--article?page=2` },
+    })
+    expect(collection.results).toHaveLength(1)
+    expect(collection.results[0]).toMatchObject({ title: "With meta" })
+  })
+
   test("fetches a resource collection", async () => {
     const drupal = new NextDrupal(BASE_URL)
 

@@ -155,3 +155,9 @@ export interface DrupalView<T = Record<string, any>[]> {
   meta: JsonApiResponse["meta"]
   links: JsonApiResponse["links"]
 }
+
+export interface DrupalResourceCollection<T = JsonApiResource[]> {
+  results: T
+  meta: JsonApiResponse["meta"]
+  links: JsonApiResponse["links"]
+}

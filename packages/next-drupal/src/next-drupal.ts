@@ -7,6 +7,7 @@ import type {
   BaseUrl,
   DrupalFile,
   DrupalMenuItem,
+  DrupalResourceCollection,
   DrupalTranslatedPath,
   DrupalView,
   JsonApiCreateFileResourceBody,
@@ -757,9 +758,26 @@ export class NextDrupal extends NextDrupalBase {
     type: string,
     options?: {
       deserialize?: boolean
+      // Set to true (with the overload below) to return
+      // { results, meta, links } instead of the bare array, giving access
+      // to the JSON:API pagination metadata.
+      withMeta?: false
     } & JsonApiOptions &
       JsonApiWithNextFetchOptions
-  ): Promise<T> {
+  ): Promise<T>
+  async getResourceCollection<T = JsonApiResource[]>(
+    type: string,
+    options?: {
+      deserialize?: boolean
+      withMeta: true
+    } & JsonApiOptions &
+      JsonApiWithNextFetchOptions
+  ): Promise<DrupalResourceCollection<T>>
+  async getResourceCollection<T = JsonApiResource[]>(
+    type: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    options?: any
+  ): Promise<T | DrupalResourceCollection<T>> {
     options = {
       withAuth: this.withAuth,
       deserialize: true,
@@ -787,6 +805,14 @@ export class NextDrupal extends NextDrupalBase {
     )
 
     const json = await response.json()
+
+    if (options.deserialize && options.withMeta) {
+      return {
+        results: this.deserialize(json) as unknown as T,
+        meta: json.meta,
+        links: json.links,
+      }
+    }
 
     return options.deserialize ? this.deserialize(json) : json
   }
@@ -847,7 +873,7 @@ export class NextDrupal extends NextDrupalBase {
 
         return Promise.all(
           locales.map(async (locale) => {
-            let opts: Parameters<NextDrupal["getResourceCollection"]>[1] = {
+            let opts: JsonApiOptions & JsonApiWithNextFetchOptions = {
               params,
               withAuth: options.withAuth,
               next: options.next,
@@ -861,7 +887,7 @@ export class NextDrupal extends NextDrupalBase {
                 ...(options.defaultLocale
                   ? { defaultLocale: options.defaultLocale }
                   : {}),
-              } as unknown as typeof opts
+              } as JsonApiOptions & JsonApiWithNextFetchOptions
             }
             const resources = await this.getResourceCollection<
               JsonApiResourceWithPath[]
