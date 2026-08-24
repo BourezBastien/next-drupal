@@ -133,7 +133,12 @@ mergeable ones likely obsolete: #67, #306, #425, #446, #491.
 #448 (JSON:API index fetch failure: troubleshooting checklist in the FAQ — server-side reachability, subdirectory base URL, local https),
 #452 (link field aliases: jsonapi_extras URL enhancer or the core computed-URL patch — FAQ entry),
 #474 (install profile: jsonapi_hypermedia added to drupal/config/core.extension.yml, as proposed by upstream PR #491 — jsonapi_menu_items requires it),
-#483 (getView now logs the endpoint in debug mode, matching the reporter's ask).
+#483 (getView now logs the endpoint in debug mode, matching the reporter's ask),
+#489 (docs already say "UUID (client ID)" when describing the consumer — no client_uuid wording remains),
+#491 (install profile: duplicate of #474, fixed by the jsonapi_hypermedia addition),
+#493 (preview secret expired: duplicate of #422, covered by the known-issues entry),
+#495 (edit forms no longer hijacked by the preview: the HtmlRenderer only takes canonical and revision routes, with the early return for empty sites from upstream PR #481 — verified in code),
+#513 (multi-domain previewing: deferred — one preview_url per NextSite by design; per-domain or per-locale preview URLs need a design pass).
 
 Already resolved by adopted/other work (no further action): #148 (preview alerts already use a plain <a>, fix from the issue thread applied upstream), #740 (flaky coverage — Node bug mitigated by the .nvmrc v18.19 pin, referenced in .nvmrc), #838 (v1.6 menu link already correct), #581 (ESM + sideEffects:false already shipped), #746 (fixed by adopted PR #747),
 #589 (permission list incl. View all revisions already in the draft-mode guide),
