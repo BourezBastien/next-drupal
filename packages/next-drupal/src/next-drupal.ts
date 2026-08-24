@@ -977,8 +977,13 @@ export class NextDrupal extends NextDrupalBase {
       searchParams.host = options.host.replace(/:\d+$/, "")
     }
 
+    // Prefix the endpoint with the locale so Decoupled Router resolves the
+    // path in the right language on multilingual sites.
     const endpoint = this.buildUrl(
-      "/router/translate-path",
+      this.addLocalePrefix("/router/translate-path", {
+        locale: options.locale,
+        defaultLocale: options.defaultLocale,
+      }),
       searchParams
     ).toString()
 

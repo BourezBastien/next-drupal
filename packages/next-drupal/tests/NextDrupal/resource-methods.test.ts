@@ -1639,6 +1639,44 @@ describe("translatePath()", () => {
     expect(init.headers.get("accept")).toBe("application/json")
   })
 
+  test("prefixes the endpoint with the locale", async () => {
+    const drupal = new NextDrupal(BASE_URL)
+
+    const fetchSpy = spyOnFetch({
+      status: 200,
+      responseBody: mocks.resources.translatePath.ok,
+    })
+
+    await drupal.translatePath("/recipes/deep-mediterranean-quiche", {
+      locale: "fr",
+      defaultLocale: "en",
+    })
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      expect.stringContaining("/fr/router/translate-path"),
+      expect.anything()
+    )
+  })
+
+  test("omits the prefix for the default locale", async () => {
+    const drupal = new NextDrupal(BASE_URL)
+
+    const fetchSpy = spyOnFetch({
+      status: 200,
+      responseBody: mocks.resources.translatePath.ok,
+    })
+
+    await drupal.translatePath("/recipes/deep-mediterranean-quiche", {
+      locale: "en",
+      defaultLocale: "en",
+    })
+
+    expect(fetchSpy).toHaveBeenCalledWith(
+      expect.not.stringContaining("/en/router/translate-path"),
+      expect.anything()
+    )
+  })
+
   test("throws an error on server error", async () => {
     const drupal = new NextDrupal(BASE_URL)
 

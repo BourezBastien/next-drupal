@@ -60,6 +60,17 @@ export type TranslatePathOptions = {
    * The port, if any, is stripped.
    */
   host?: string
+  /**
+   * Resolve the path against a specific language by prefixing the
+   * Decoupled Router endpoint with the locale.
+   */
+  locale?: Locale
+  /**
+   * The default locale. The locale prefix is omitted when locale equals
+   * defaultLocale, unless the Drupal site prefixes its default language —
+   * omit defaultLocale to keep the prefix.
+   */
+  defaultLocale?: Locale
 }
 /**
  * JSON:API params such as filter, fields, include or sort.
