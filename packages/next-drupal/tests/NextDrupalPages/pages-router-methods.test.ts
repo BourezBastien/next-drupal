@@ -753,6 +753,61 @@ describe("getResourceCollectionFromContext()", () => {
 })
 
 describe("getResourceFromContext()", () => {
+  test("adds default_langcode to sparse fieldsets", async () => {
+    const drupal = new NextDrupalPages(BASE_URL)
+
+    // The pages client resolves endpoints through the JSON:API index.
+    spyOnFetchOnce({
+      status: 200,
+      responseBody: {
+        links: {
+          "node--recipe": {
+            href: `${BASE_URL}/jsonapi/node/recipe`,
+          },
+        },
+      },
+    })
+    const fetchSpy = spyOnFetchOnce({
+      status: 200,
+      responseBody: {
+        data: [
+          {
+            type: "node--recipe",
+            id: "11111111-1111-1111-1111-111111111111",
+            attributes: {
+              title: "Recipe",
+              default_langcode: true,
+            },
+          },
+        ],
+      },
+    })
+
+    const recipe = await drupal.getResourceFromContext(
+      {
+        jsonapi: { resourceName: "node--recipe" },
+        entity: {
+          uuid: "11111111-1111-1111-1111-111111111111",
+          langcode: "en",
+          bundle: "recipe",
+          type: "node",
+          id: "1",
+        },
+      } as never,
+      { params: { slug: ["recipes", "quiche"] } } as GetStaticPropsContext,
+      {
+        deserialize: false,
+        params: {
+          "fields[node--recipe]": "title",
+        },
+      }
+    )
+
+    expect(recipe).toBeTruthy()
+    const url = fetchSpy.mock.calls[1][0] as string
+    expect(url).toContain(`fields%5Bnode--recipe%5D=title%2Cdefault_langcode`)
+  })
+
   test("fetches a resource from context", async () => {
     const drupal = new NextDrupalPages(BASE_URL)
     const context: GetStaticPropsContext = {

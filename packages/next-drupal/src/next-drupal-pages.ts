@@ -237,15 +237,6 @@ export class NextDrupalPages extends NextDrupal {
       ...options,
     }
 
-    const _options = {
-      deserialize: options.deserialize,
-      isVersionable: options.isVersionable,
-      locale: context.locale,
-      defaultLocale: context.defaultLocale,
-      withAuth: options?.withAuth,
-      params: options?.params ?? {},
-    } as Parameters<NextDrupalPages["getResource"]>[2]
-
     // Check if resource is versionable.
     // Add support for revisions for node by default.
     const isVersionable = options.isVersionable || /^node--/.test(type)
@@ -261,6 +252,35 @@ export class NextDrupalPages extends NextDrupal {
         previewData?.resourceVersion || "rel:latest-version"
       options.params = versionedParams
     }
+
+    // Sparse fieldsets must include default_langcode: the resource is
+    // fetched through the decoupled router, which may resolve a non-default
+    // translation, and consumers rely on default_langcode to detect it.
+    // Omitting it from fields[...] made downstream checks read undefined
+    // and resources appear as non-default translations. (#155)
+    const fieldsKey = `fields[${type}]`
+    const fields = options.params?.[fieldsKey]
+    if (
+      typeof fields === "string" &&
+      !fields
+        .split(",")
+        .map((f) => f.trim())
+        .includes("default_langcode")
+    ) {
+      options.params = {
+        ...options.params,
+        [fieldsKey]: `${fields},default_langcode`,
+      }
+    }
+
+    const _options = {
+      deserialize: options.deserialize,
+      isVersionable: options.isVersionable,
+      locale: context.locale,
+      defaultLocale: context.defaultLocale,
+      withAuth: options?.withAuth,
+      params: options?.params ?? {},
+    } as Parameters<NextDrupalPages["getResource"]>[2]
 
     if (typeof input !== "string") {
       // Fix for subrequests and translation.
