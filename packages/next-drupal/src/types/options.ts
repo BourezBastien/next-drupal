@@ -52,6 +52,15 @@ export type JsonApiWithNextFetchOptions = {
   next?: NextFetchRequestConfig
   cache?: RequestCache
 }
+
+export type TranslatePathOptions = {
+  /**
+   * Forward the original request host to Decoupled Router so it can resolve
+   * the path against the site that served the request in multi-site setups.
+   * The port, if any, is stripped.
+   */
+  host?: string
+}
 // TODO: Properly type this.
 /**
  * JSON:API params such as filter, fields, include or sort.

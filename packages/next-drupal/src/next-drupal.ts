@@ -24,6 +24,7 @@ import type {
   Locale,
   NextDrupalOptions,
   PathPrefix,
+  TranslatePathOptions,
 } from "./types"
 
 const DEFAULT_API_PREFIX = "/jsonapi"
@@ -909,7 +910,7 @@ export class NextDrupal extends NextDrupalBase {
    * Translates a path to a DrupalTranslatedPath object.
    *
    * @param {string} path The resource path. Example: `/blog/slug-for-article`.
-   * @param {JsonApiWithAuthOption & JsonApiWithNextFetchOptions} options Options for the request.
+   * @param {JsonApiWithAuthOption & JsonApiWithNextFetchOptions & TranslatePathOptions} options Options for the request.
    * @returns {Promise<DrupalTranslatedPath | null>} The translated path.
    * @requires Decoupled Router module
    * @example
@@ -917,19 +918,37 @@ export class NextDrupal extends NextDrupalBase {
    * ```ts
    * const path = await drupal.translatePath("/blog/slug-for-article")
    * ```
+   * @example
+   * Forward the request host so Decoupled Router can negotiate the language
+   * of the correct site in a multi-site, multi-language setup
+   * ```ts
+   * import { headers } from "next/headers"
+   * const host = (await headers()).get("host")
+   * const path = await drupal.translatePath("/blog/slug-for-article", { host })
+   * ```
    */
   async translatePath(
     path: string,
-    options?: JsonApiWithAuthOption & JsonApiWithNextFetchOptions
+    options?: JsonApiWithAuthOption &
+      JsonApiWithNextFetchOptions &
+      TranslatePathOptions
   ): Promise<DrupalTranslatedPath | null> {
     options = {
       withAuth: this.withAuth,
       ...options,
     }
 
-    const endpoint = this.buildUrl("/router/translate-path", {
-      path,
-    }).toString()
+    const searchParams: { path: string; host?: string } = { path }
+    if (options.host) {
+      // Forward the original host so Decoupled Router resolves paths against
+      // the site that served the request. Strip the port, if any.
+      searchParams.host = options.host.replace(/:\d+$/, "")
+    }
+
+    const endpoint = this.buildUrl(
+      "/router/translate-path",
+      searchParams
+    ).toString()
 
     this.debug(`Fetching translated path, ${path}.`)
 
