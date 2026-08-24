@@ -33,6 +33,33 @@ describe("addLocalePrefix()", () => {
       })
     ).toBe("/es/foo")
   })
+
+  test("adds locale prefix when path starts with same letters as the locale", () => {
+    expect(
+      drupal.addLocalePrefix("/enable/testing", {
+        locale: "en",
+        defaultLocale: "fi",
+      })
+    ).toBe("/en/enable/testing")
+  })
+
+  test("does not duplicate locale prefix when path is the locale root", () => {
+    expect(
+      drupal.addLocalePrefix("/en", {
+        locale: "en",
+        defaultLocale: "fi",
+      })
+    ).toBe("/en")
+  })
+
+  test("does not duplicate locale prefix when path already has it", () => {
+    expect(
+      drupal.addLocalePrefix("/en/foo", {
+        locale: "en",
+        defaultLocale: "fi",
+      })
+    ).toBe("/en/foo")
+  })
 })
 
 describe("buildUrl()", () => {
