@@ -10,7 +10,14 @@ deterministic content — no Chapter Three database required.
    module and the `next_tests_seed` module, installs with a short-path
    sqlite database, enables all modules and creates the `e2e` Next site.
 2. Serve it: `(cd .phpunit-drupal && ./vendor/bin/drush runserver 127.0.0.1:8090 &)`
-3. Run the specs: `npx cypress run --project test/e2e`
+3. Build and serve the Next.js app (test/e2e/next-app, a workspace using the local next-drupal):
+   ```sh
+   cd test/e2e/next-app
+   DRUPAL_BASE_URL=http://127.0.0.1:8090 npx next build
+   DRUPAL_BASE_URL=http://127.0.0.1:8090 npx next start -p 3000 &
+   ```
+4. Run the specs: `npx cypress run --project test/e2e` (JSON:API specs target
+   the Drupal site on :8090, rendering specs target the Next.js app on :3000).
 
 The specs assert the exact titles seeded by
 `modules/next/tests/modules/next_tests_seed` (`Next tests home`,
