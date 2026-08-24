@@ -49,9 +49,9 @@ export type JsonDeserializer = (
 ) => TJsonaModel | TJsonaModel[]
 
 export interface DataCache {
-  get(key): Promise<unknown>
+  get(key: string): Promise<unknown>
 
-  set(key, value, ttl?: number): Promise<unknown>
+  set(key: string, value: unknown, ttl?: number): Promise<unknown>
 
-  del?(keys): Promise<unknown>
+  del?(keys: string[]): Promise<unknown>
 }

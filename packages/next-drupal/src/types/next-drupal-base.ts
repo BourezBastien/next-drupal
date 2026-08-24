@@ -122,13 +122,13 @@ export type AccessTokenScope = string
 export type Fetcher = WindowOrWorkerGlobalScope["fetch"]
 
 export interface Logger {
-  log(message): void
+  log(message: string | Error): void
 
-  debug(message): void
+  debug(message: string | Error): void
 
-  warn(message): void
+  warn(message: string | Error): void
 
-  error(message): void
+  error(message: string | Error): void
 }
 
 export type EndpointSearchParams =

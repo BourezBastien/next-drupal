@@ -80,6 +80,7 @@
     "react-dom": "^18.2 || ^19.0"
   },
   "devDependencies": {
+    "@types/qs": "^6.15.1",
     "typescript": "^5.7.2"
   }
 }

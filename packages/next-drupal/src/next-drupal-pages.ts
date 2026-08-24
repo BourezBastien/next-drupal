@@ -561,14 +561,17 @@ export class NextDrupalPages extends NextDrupal {
         _path = _path.replace(`${pathPrefix}/`, "")
       }
 
-      const path = {
+      const path: {
+        params: { slug: string[] }
+        locale?: Locale
+      } = {
         params: {
           slug: _path.split("/"),
         },
       }
 
       if (options?.locale) {
-        path["locale"] = options.locale
+        path.locale = options.locale
       }
 
       return path
@@ -717,8 +720,13 @@ export class NextDrupalPages extends NextDrupal {
       return this.withAuth
     }
 
+    // Preview data is an opaque object set by the preview plugin.
+    const previewData = context.previewData as
+      | Record<string, string>
+      | undefined
+
     // If no plugin is provided, return.
-    const plugin = context.previewData?.["plugin"]
+    const plugin = previewData?.["plugin"]
     if (!plugin) {
       return null
     }
@@ -727,16 +735,16 @@ export class NextDrupalPages extends NextDrupal {
 
     if (plugin === "simple_oauth") {
       // If we are using a client id and secret auth, pass the scope.
-      if (isClientIdSecretAuth(withAuth) && context.previewData?.["scope"]) {
+      if (isClientIdSecretAuth(withAuth) && previewData?.["scope"]) {
         withAuth = {
           ...withAuth,
-          scope: context.previewData?.["scope"],
+          scope: previewData?.["scope"],
         }
       }
     }
 
     if (plugin === "jwt") {
-      const accessToken = context.previewData?.["access_token"]
+      const accessToken = previewData?.["access_token"]
 
       if (accessToken) {
         return `Bearer ${accessToken}`

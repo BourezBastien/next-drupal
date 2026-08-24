@@ -1311,7 +1311,10 @@ export class NextDrupal extends NextDrupalBase {
    * const resource = drupal.deserialize(json)
    * ```
    */
-  deserialize(body, options?) {
+  deserialize(
+    body: Record<string, unknown>,
+    options?: Record<string, unknown>
+  ) {
     if (!body) return null
 
     return this.deserializer(body, options)

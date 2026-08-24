@@ -8,7 +8,10 @@ const JSONAPI_PREFIX = process.env.DRUPAL_JSONAPI_PREFIX || "/jsonapi"
 
 const dataFormatter = new Jsona()
 
-export function deserialize(body, options?) {
+export function deserialize(
+  body: Record<string, unknown>,
+  options?: Record<string, unknown>
+) {
   if (!body) return null
 
   return dataFormatter.deserialize(body, options)
@@ -83,8 +86,8 @@ export async function buildHeaders({
   },
 }: {
   accessToken?: AccessToken
-  headers?: RequestInit["headers"]
-} = {}): Promise<RequestInit["headers"]> {
+  headers?: Record<string, string>
+} = {}): Promise<Record<string, string>> {
   // This allows an access_token (preferrably long-lived) to be set directly on the env.
   // This reduces the number of OAuth call to the Drupal server.
   // Intentionally marked as unstable for now.
@@ -125,7 +128,7 @@ export function getPathFromContext(
       : slug
 }
 
-export function syncDrupalPreviewRoutes(path) {
+export function syncDrupalPreviewRoutes(path: string) {
   if (window && window.top !== window.self) {
     window.parent.postMessage(
       { type: "NEXT_DRUPAL_ROUTE_SYNC", path },
