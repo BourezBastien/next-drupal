@@ -37,6 +37,10 @@ const path = (req.query.slug as string).replace(/\/?$/, "/")
 await res.revalidate(path)
 ```
 
+### Revalidating other routes only
+
+For server-rendered pages there is nothing to revalidate on the entity page itself, but listing pages (the homepage, a blog overview…) still need purging. Uncheck **Revalidate page** and list the routes in **Additional paths** instead — e.g. `/` for the homepage — so only those paths are revalidated when the entity changes.
+
 ---
 
 ## Cache Tag Revalidator
