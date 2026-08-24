@@ -71,3 +71,15 @@ export async function getBlock(
   })
 }
 ```
+
+---
+
+## Drupal cache recommendations
+
+The internal Drupal caches do not affect what the Next.js site renders: JSON:API responses are built from Drupal's entity caches, and the Next.js data cache — invalidated by the [revalidators](/docs/revalidator) configured in the next module — decides what visitors see.
+
+Recommendations for the Drupal side:
+
+- **Keep Drupal's internal caches enabled**, including the page cache and the dynamic page cache. They speed up authenticated editor requests and JSON:API response building. Disabling them only slows Drupal down without changing Next.js behavior.
+- **Rely on on-demand revalidation** as the source of truth for the Next.js cache. Entity saves in Drupal trigger the configured revalidators, so stale content is purged regardless of Drupal's internal caching.
+- **Edge/CDN caches in front of Drupal are safe for anonymous JSON:API requests.** Requests carrying an `Authorization` header should bypass the CDN cache and hit Drupal directly, where the dynamic page cache takes over.

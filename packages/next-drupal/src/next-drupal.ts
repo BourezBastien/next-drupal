@@ -985,6 +985,10 @@ export class NextDrupal extends NextDrupalBase {
     this.debug(`Fetching translated path, ${path}.`)
 
     const response = await this.fetch(endpoint, {
+      // The decoupled_router route requires the json format. Ask for it
+      // explicitly instead of relying on the default JSON:API Accept
+      // header, which older Drupal versions fail to negotiate to json.
+      headers: { Accept: "application/json" },
       withAuth: options.withAuth,
       next: options.next,
       cache: options.cache,

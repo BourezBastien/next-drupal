@@ -1,11 +1,34 @@
 import { JWT } from "next-auth/jwt"
+import jwt_decode from "jwt-decode"
 import { AccessToken } from "next-drupal"
 import { cache } from "./node-cache"
 
 const JWT_CACHE_KEY = "NEXT_AUTH_JWT_TOKEN"
 
+interface DrupalJwtClaims {
+  id?: string | number
+  sub?: string
+}
+
+// Cache key derived from the Drupal user id in the token claims so every
+// authenticated user gets their own cache entry, and rotated tokens land in
+// the same entry after a refresh. Falls back to the raw access token when no
+// id can be decoded.
+function cacheKeyFor(token: JWT): string {
+  try {
+    const claims = jwt_decode<DrupalJwtClaims>(token.accessToken.access_token)
+    const userId = claims.id ?? claims.sub
+    if (userId) {
+      return `${JWT_CACHE_KEY}.${userId}`
+    }
+  } catch {
+    // Fall through to the token-based key.
+  }
+  return `${JWT_CACHE_KEY}.${token.accessToken.access_token}`
+}
+
 export async function getJWT(initialJWT: JWT): Promise<JWT> {
-  const key = `${JWT_CACHE_KEY}.${initialJWT.accessToken.access_token}`
+  const key = cacheKeyFor(initialJWT)
 
   const cachedJWT = cache.get<JWT>(key)
 
@@ -25,15 +48,15 @@ export async function getJWT(initialJWT: JWT): Promise<JWT> {
   // The token has expired, fetch a new one.
   const newJWT = await refreshAccessToken(cachedJWT)
 
-  // Persist this to cache.
+  // Persist this to cache. The key is derived from the user id, so the
+  // rotated token replaces the expired one in the same entry.
   cache.set(key, newJWT, newJWT.accessToken.expires_in)
 
   return newJWT
 }
 
 export async function clearJWT(jwt: JWT) {
-  const key = `${JWT_CACHE_KEY}.${jwt.accessToken.access_token}`
-  cache.del(key)
+  cache.del(cacheKeyFor(jwt))
 }
 
 // Helper to obtain a new access_token from a refresh token.
