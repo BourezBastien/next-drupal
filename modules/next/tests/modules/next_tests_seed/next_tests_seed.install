@@ -15,7 +15,7 @@ use Drupal\node\Entity\NodeType;
  *
  * Creates a fixed set of content so end-to-end tests can assert exact
  * values. Everything created here is deterministic: titles, aliases and
- * body text never change between runs.
+ * revision log messages never change between runs.
  */
 function next_tests_seed_install(): void {
   // A dedicated content type keeps the seed independent of the profile.
@@ -31,19 +31,17 @@ function next_tests_seed_install(): void {
     'home' => [
       'title' => 'Next tests home',
       'alias' => '/next-tests/home',
-      'body' => 'Deterministic home page body for next-drupal end-to-end tests.',
     ],
     'about' => [
       'title' => 'Next tests about',
       'alias' => '/next-tests/about',
-      'body' => 'Deterministic about page body for next-drupal end-to-end tests.',
     ],
   ];
 
   $storage = \Drupal::entityTypeManager()->getStorage('node');
 
   foreach ($pages as $key => $values) {
-    $uuid = '00000000-0000-0000-0000-0000000000' . ($key === 'home' ? '1' : '2');
+    $uuid = '00000000-0000-0000-0000-00000000000' . ($key === 'home' ? '1' : '2');
     if ($storage->loadByProperties(['uuid' => $uuid])) {
       continue;
     }
@@ -51,12 +49,46 @@ function next_tests_seed_install(): void {
       'type' => 'next_test_page',
       'title' => $values['title'],
       'path' => ['alias' => $values['alias']],
-      'body' => [
-        'value' => $values['body'],
-        'format' => 'plain_text',
-      ],
       'status' => 1,
       'uuid' => $uuid,
+      'revision_log_message' => 'Seed revision 1',
     ])->save();
+  }
+
+  // Second revision of the home page, kept as the default (published)
+  // revision. The title is unchanged (specs assert it); the revision is
+  // identifiable by its log message and its version id, so revision-aware
+  // features (draft mode, resourceVersion) can be tested deterministically.
+  $existing = $storage->loadByProperties([
+    'type' => 'next_test_page',
+    'title' => 'Next tests home',
+  ]);
+  $home = reset($existing);
+  if ($home && count($storage->revisionIds($home)) < 2) {
+    $home->setNewRevision(TRUE);
+    $home->setRevisionLogMessage('Seed revision 2');
+    $home->save();
+  }
+
+  // Allow anonymous JSON:API consumers to address non-default revisions,
+  // so revision features (draft mode, resourceVersion) can be tested.
+  \Drupal::configFactory()->getEditable('user.role.anonymous')
+    ->set('permissions', array_merge(
+      \Drupal::config('user.role.anonymous')->get('permissions') ?: [],
+      ['view next_test_page revisions']
+    ))
+    ->save();
+
+  // A menu link pointing at the home page, for menu-based features.
+  if (\Drupal::moduleHandler()->moduleExists('menu_link_content')) {
+    $link_storage = \Drupal::entityTypeManager()->getStorage('menu_link_content');
+    if (!$link_storage->loadByProperties(['title' => 'Next tests home link'])) {
+      $link_storage->create([
+        'title' => 'Next tests home link',
+        'menu_name' => 'main',
+        'link' => ['uri' => 'internal:/next-tests/home'],
+        'uuid' => '00000000-0000-0000-0000-0000000000aa',
+      ])->save();
+    }
   }
 }
