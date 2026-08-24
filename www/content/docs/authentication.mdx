@@ -195,3 +195,30 @@ const articles = await drupal.getResourceCollection("node--article", {
   withAuth: session.accessToken,
 })
 ```
+
+### Using the NextAuth access token for preview
+
+`getStaticProps`/`getServerSideProps` run server-side, but the NextAuth
+session is request-scoped — it is not directly available when the
+preview page is (re)generated. Pass the access token through the preview
+flow instead:
+
+1. In your preview API route, put the token in the preview data (or let
+   your [custom preview url generator plugin](/docs/previews) fetch it).
+2. In `getStaticProps`, read it from `context.previewData` and pass it
+   to `withAuth`:
+
+```ts
+export async function getStaticProps(context) {
+  const accessToken = context.previewData?.access_token
+
+  const node = await drupal.getResourceFromContext("node--article", context, {
+    withAuth: accessToken ? `Bearer ${accessToken}` : true,
+  })
+
+  return { props: { node } }
+}
+```
+
+This keeps authenticated fetches limited to preview requests while the
+public pages stay unauthenticated.
