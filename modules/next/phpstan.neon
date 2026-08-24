@@ -1,5 +1,8 @@
 parameters:
   level: 5
+  scanFiles:
+    # Procedural hooks called from tests must be known to the analyzer.
+    - next.module
   paths:
     - src
     - tests/src
