@@ -67,6 +67,14 @@ mergeable ones likely obsolete: #67, #306, #425, #446, #491.
 3. i18n/locale paths (#854 — fixed on branch `fix/854-add-locale-prefix`)
 4. Next.js 16 compatibility (#884)
 
+## Classified as spec/by-design
+
+- **#649** (filters not applied to individual resources): JSON:API spec — filters do not
+  apply to individual resource reads, only to collections and includes. The
+  parameters are forwarded correctly by the client.
+- **#682** (getMenu + output:export): needs a static-export reproduction; likely
+  revalidate/cache semantics during prerender.
+
 ## Issues parked as needs-reproduction (do not force a blind fix)
 
 - **#849** (jsona returns `{type,id,links}` skeletons): no reproduction in our
@@ -87,7 +95,7 @@ mergeable ones likely obsolete: #67, #306, #425, #446, #491.
 
 ## Resolved on the fork (status as of session 3)
 
-#854, #499, #874, #912, #861, #855, #859, #847, #911, #862, #848, #850, #686, #799, #681, #772, #722, #779.
+#854, #499, #874, #912, #861, #855, #859, #847, #911, #862, #848, #850, #686, #799, #681, #772, #722, #779, #155, #346, #650.
 Adopted upstream PRs: #865, #790, #791, #842, #904, #853, #844, #876, #856
 (adapted as `host` option), #860 (#846 was already fixed upstream by #887).
 

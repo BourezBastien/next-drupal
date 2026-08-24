@@ -7,8 +7,8 @@
 
 ## État d'avancement (mis à jour 2026-08-24, session 3)
 
-### Issues GitHub résolues et mergées sur main (19)
-#854 (locale prefix), #499 (type promote), #874 (meta relationships), #912 (sous-répertoire), #861 (locale + cache tags), #855 (debug sites vides), #859 (lien live révisions), #847 (docs preview→draft), #911 (revalider la source des redirects, avec test kernel), #862 + #848 (docs du revalidator cache_tag), #850 (pagination des chemins statiques, avec tests), #686 (types `drupal_internal__*id` en number), #799 (`credentials` seulement si le runtime le supporte, avec test), #681 (contrainte du générique de `getMenu` — réglée par le retypage `T extends DrupalMenuItem`), #772 (starter : notFound() au lieu de throw → la revalidation à la dépublication réussit), #722 (option withMeta sur getResourceCollection → {results, meta, links} avec type DrupalResourceCollection), #779 (l'événement d'entité porte la langue → le chemin de la traduction supprimée est revalidé, test kernel), #155 (injection automatique de default_langcode dans les sparse fieldsets from-context, avec test).
+### Issues GitHub résolues et mergées sur main (21)
+#854 (locale prefix), #499 (type promote), #874 (meta relationships), #912 (sous-répertoire), #861 (locale + cache tags), #855 (debug sites vides), #859 (lien live révisions), #847 (docs preview→draft), #911 (revalider la source des redirects, avec test kernel), #862 + #848 (docs du revalidator cache_tag), #850 (pagination des chemins statiques, avec tests), #686 (types `drupal_internal__*id` en number), #799 (`credentials` seulement si le runtime le supporte, avec test), #681 (contrainte du générique de `getMenu` — réglée par le retypage `T extends DrupalMenuItem`), #772 (starter : notFound() au lieu de throw → la revalidation à la dépublication réussit), #722 (option withMeta sur getResourceCollection → {results, meta, links} avec type DrupalResourceCollection), #779 (l'événement d'entité porte la langue → le chemin de la traduction supprimée est revalidé, test kernel), #155 (injection automatique de default_langcode dans les sparse fieldsets from-context, avec test), #346 (plugin de génération d'URL de preview effaçable → désinstallation possible, avec schema fallback et test), #650 (docs : flag extra.enable-patching requis par composer-patches 2.x). #649 (limite spec JSON:API, classée) et #682 (needs repro avec output:export, parkée).
 
 ### PR upstream adoptées (avec attribution Co-authored-by)
 #865, #790, #791, #842, #904, #853 (durci + test SSG), #844 (durci garde null), #876, #856 (réimplémenté en option `host` explicite), #860. #846 déjà résolue en amont (#887). Dependabot : qs → 6.15.3 et nanoid → 3.3.18 appliqués nous-mêmes (remplace #908, #929).
@@ -43,6 +43,7 @@
 ### E2E : chantier next_tests — PIPELINE OPÉRATIONNEL (session 6)
 - ✅ **Cypress 3/3 specs PASSENT** contre un site Drupal local seedé (JSON:API index, contenu déterministe, decoupled router) — exécution réelle, sans DB Chapter Three.
 - ✅ Script reproductible `test/e2e/install-drupal.sh` + doc `test/e2e/README.md` (pièges documentés : chemin sqlite ≤128, purge conteneur périmé, extraction binaire cypress).
+- ✅ **Specs seed-features (révisions + menu) passantes** : UUIDs 36 chars corrects, 2e révision, lien de menu, permission de révision anonyme — **9/9 specs cypress**.
 - ✅ **Specs de RENDU Next.js passantes** : app  (workspace lié à next-drupal local) rend les pages seedées via translatePath + getResource — **6/6 specs cypress** (JSON:API + rendu + 404).
 - ⏭️ Suite : enrichir le seed (menus, médias, révisions) et étendre les specs, puis réécrire les specs faker historiques sur ce socle.
 - La demande de DB Chapter Three reste pertinente pour les specs legacy (action Bastien, Slack #nextjs).
