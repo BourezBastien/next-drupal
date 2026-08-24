@@ -93,14 +93,22 @@ mergeable ones likely obsolete: #67, #306, #425, #446, #491.
   token (build workers + runtime instances). Expected behavior; a shared token
   cache would be an opt-in feature, not a bug fix.
 
-## Resolved on the fork (status as of session 8)
+## Resolved on the fork (status as of session 9)
 
-#854, #499, #874, #912, #861, #855, #859, #847, #911, #862, #848, #850, #686, #799, #681, #772, #722, #779, #155, #346, #650, #793, #813, #818, #246, #533, #783 (docs ddev/consommateur), #806 (numérotation umami + patches déjà corrigés), #611 (pattern next-auth preview), #653 (base_url rendered as a link in the next_site listing, kernel-tested), #696 (Path revalidator logs non-200 responses as warnings, kernel-tested).
+#854, #499, #874, #912, #861, #855, #859, #847, #911, #862, #848, #850, #686, #799, #681, #772, #722, #779, #155, #346, #650, #793, #813, #818, #246, #533, #783 (docs ddev/consommateur), #806 (numérotation umami + patches déjà corrigés), #611 (pattern next-auth preview), #653 (base_url rendered as a link in the next_site listing, kernel-tested), #696 (Path revalidator logs non-200 responses as warnings, kernel-tested), #615 (consumer collection path resolved via Url::fromRoute with a safe fallback, kernel-tested with consumers enabled), #532 + #535 (version added to modules/next/package.json — no more yarn workspace warning), #422 + #493 (preview secret expiration documented in known-issues.mdx: refresh the preview or raise secret_expiration).
 
 Already resolved by adopted/other work (no further action): #148 (preview alerts already use a plain <a>, fix from the issue thread applied upstream), #740 (flaky coverage — Node bug mitigated by the .nvmrc v18.19 pin, referenced in .nvmrc), #838 (v1.6 menu link already correct), #581 (ESM + sideEffects:false already shipped), #746 (fixed by adopted PR #747),
 #589 (permission list incl. View all revisions already in the draft-mode guide),
 #93 (getStaticPathsFromContext already parallelizes types AND locales with
-Promise.all — verified in next-drupal-pages.ts).
+Promise.all — verified in next-drupal-pages.ts),
+#579 (client-credentials token fetch on write operations is the designed auth
+flow; tokens are cached and reused — getAccessToken checks expiry and same
+clientId/clientSecret/scope; the reporter's auth server simply lacks the
+client_credentials grant),
+#158 (front page per locale needs a locale→frontPage map — API design decision,
+documented workaround in the issue; deferred),
+#613 (Turbopack: nothing bundler-specific in the client — plain fetch + qs;
+support follows the Next.js version, no action possible in the library).
 Adopted upstream PRs: #865, #790, #791, #842, #904, #853, #844, #876, #856
 (adapted as `host` option), #860 (#846 was already fixed upstream by #887).
 
