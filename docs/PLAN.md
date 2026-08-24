@@ -5,10 +5,10 @@
 
 ---
 
-## État d'avancement (mis à jour 2026-08-24, session 2)
+## État d'avancement (mis à jour 2026-08-24, session 3)
 
-### Issues GitHub résolues et mergées sur main (11)
-#854 (locale prefix), #499 (type promote), #874 (meta relationships), #912 (sous-répertoire), #861 (locale + cache tags), #855 (debug sites vides), #859 (lien live révisions), #847 (docs preview→draft), #911 (revalider la source des redirects, avec test kernel), #862 + #848 (docs du revalidator cache_tag : listes et entités référencées).
+### Issues GitHub résolues et mergées sur main (15)
+#854 (locale prefix), #499 (type promote), #874 (meta relationships), #912 (sous-répertoire), #861 (locale + cache tags), #855 (debug sites vides), #859 (lien live révisions), #847 (docs preview→draft), #911 (revalider la source des redirects, avec test kernel), #862 + #848 (docs du revalidator cache_tag), #850 (pagination des chemins statiques, avec tests), #686 (types `drupal_internal__*id` en number), #799 (`credentials` seulement si le runtime le supporte, avec test), #681 (contrainte du générique de `getMenu` — réglée par le retypage `T extends DrupalMenuItem`).
 
 ### PR upstream adoptées (avec attribution Co-authored-by)
 #865, #790, #791, #842, #904, #853 (durci + test SSG), #844 (durci garde null), #876, #856 (réimplémenté en option `host` explicite), #860. #846 déjà résolue en amont (#887). Dependabot : qs → 6.15.3 et nanoid → 3.3.18 appliqués nous-mêmes (remplace #908, #929).
@@ -19,7 +19,7 @@
 - Test instable `SimpleOauthPreviewUrlGeneratorTest` (timestamp `now` expirant à l'exécution).
 
 ### Phase 0 — Fondations qualité : avancement
-- ✅ `noImplicitAny: true` activé sur `packages/next-drupal` (32 annotations corrigées, `@types/qs` ajouté).
+- ✅ `noImplicitAny: true` **et** `strictNullChecks: true` activés sur `packages/next-drupal` (tout `src/` y compris helpers deprecated : 0 erreur, types publics honnêtes `T | null`).
 - ✅ CI fork `.github/workflows/quality.yml` : prettier + eslint + tsc + jest (env factice) côté JS ; phpcs + PHPUnit (Drupal 10.6 via core-dev-pinned, sqlite + serveur PHP intégré) côté PHP. Recette validée localement (29/29).
 - ⏭️ Prochaines étapes : `strictNullChecks` puis `strict: true` ; ESLint durci (`no-unused-vars: error`, `import/no-cycle`, boundary `next/*` dans la classe base) ; PHPStan sur `modules/next`.
 
@@ -32,16 +32,16 @@
 - 8 exemples ont des suites Cypress (`example-marketing`, `example-auth`, `example-custom-*`, `example-search-api`, `example-webform`), lancées par `yarn test:e2e:ci` (start-server-and-test + cypress run).
 - **Bloqué sans la base Drupal privée** : les specs assert du contenu faker exact ("Build Something Amazing", etc.) qui n'existe que dans la DB/tests.next-drupal.org détenue par Chapter Three (voir TESTING.md). Le `next-drupal.json`/env des exemples vise ce backend.
 - Ce qui est vérifiable sans DB : lint des specs (OK via eslint), build des exemples contre un stub (non implémenté).
-- **Levée du blocage — deux options à arbitrer** :
-  1. **Obtenir une copie de la DB** auprès de Chapter Three (Slack Drupal `#nextjs`) — dump tests.next-drupal.org + fichiers, à restaurer dans `drupal/`. Plus rapide, dépend d'un tiers.
-  2. **Profil d'install déterministe** — module/profile `next_tests` avec config + contenu de démo seedé correspondant aux specs, puis réécriture des assertions sur le seed. Autonome mais gros chantier (TODO déjà dans TESTING.md).
-- Jusqu'à l'arbitrage, E2E reste hors des gates ; les gates unitaires (Jest ratchet + PHPUnit + phpcs) font foi.
+- **Levée du blocage — DÉCISION (session 3)** : stratégie à deux temps.
+  1. **Court terme (action Bastien)** : demander une copie de la DB tests.next-drupal.org + fichiers à Chapter Three (Slack Drupal `#nextjs`, canal du projet) — c'est le seul chemin qui débloque les specs Cypress **telles quelles** sans engineering. En attendant la réponse, E2E reste hors gates.
+  2. **Moyen terme (si refus ou silence sous ~2 semaines)** : lancer le chantier « profil d'install déterministe » — module `next_tests` avec config + contenu seedé, puis réécriture des assertions des specs sur le seed. Autonome, bénéfique pour tout contributeur, mais estimé à plusieurs jours de travail.
+- Jusqu'à l'étape 1 ou 2 aboutie, E2E reste hors des gates ; les gates unitaires (Jest ratchet + PHPUnit + phpcs) font foi.
 
 ### Dette dépendances dev (post-audit 2026-08-24)
 `yarn audit` : 1069 constats (29 critiques), tous dans la toolchain dev des examples/www/starters (node-tar, form-data via cypress 9 / vieux glob, etc.). Les dépendances **runtime du package publié** (jsona, qs 6.15.3, node-cache, next, react) sont propres. Traitement = projet dédié de modernisation (majors cypress 9→14, next 14→15 par exemple), pas des bumps au fil de l'eau.
 
-### strictNullChecks — mesuré
-66 erreurs (46 hors `deprecated/`) : sémantique d'optionalité de `auth`, gestion des `string | null` dans les flux fetch. Prochaine étape Phase 0 : branche dédiée, correction par fichiers (base → app → pages), activation du flag à la fin.
+### strictNullChecks — TERMINÉ (session 3)
+Activé package-wide avec `noImplicitAny` : 0 erreur sur tout `src/` (y compris helpers deprecated). Types publics rendus honnêtes (`T | null`, `tree?: DrupalMenuTree`, ids numériques). Prochaine étape Phase 0 : `strict: true` complet (restent principalement `strictFunctionTypes`/`strictBindCallApply`), puis ESLint durci et PHPStan.
 
 ---
 
