@@ -221,7 +221,9 @@ class Iframe extends ConfigurableSitePreviewerBase implements ContainerFactoryPl
         ]),
         'attributes' => [],
       ];
-      unset($build['toolbar']['links']['#links']['live_link']);
+      // Keep the live link for revisions: the preview URL already targets the
+      // revision via its resource version, and viewing a working copy full
+      // size instead of in the iframe is a common draft-mode workflow.
     }
 
     $build['iframe'] = [
