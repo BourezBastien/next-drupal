@@ -175,7 +175,7 @@ class NextSite extends ConfigEntityBase implements NextSiteInterface {
   /**
    * {@inheritdoc}
    */
-  public function getPreviewUrlForEntity(EntityInterface $entity): Url {
+  public function getPreviewUrlForEntity(EntityInterface $entity): ?Url {
     // Anonymous users do not have access to the preview url. Same for
     // authenticated users with no additional roles, since we assume no scope.
     if (\Drupal::currentUser()->isAnonymous() || (!count(\Drupal::currentUser()->getRoles(TRUE)) && \Drupal::currentUser()->id() !== "1")) {

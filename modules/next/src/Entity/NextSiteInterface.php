@@ -74,10 +74,11 @@ interface NextSiteInterface extends ConfigEntityInterface {
    * @param \Drupal\Core\Entity\EntityInterface $entity
    *   The entity.
    *
-   * @return \Drupal\Core\Url
-   *   The generated preview url.
+   * @return \Drupal\Core\Url|null
+   *   The generated preview url, or NULL when none can be generated (e.g.
+   *   unpublished content for users without preview access).
    */
-  public function getPreviewUrlForEntity(EntityInterface $entity): Url;
+  public function getPreviewUrlForEntity(EntityInterface $entity): ?Url;
 
   /**
    * Returns the live url for the given entity.
