@@ -93,7 +93,7 @@ mergeable ones likely obsolete: #67, #306, #425, #446, #491.
   token (build workers + runtime instances). Expected behavior; a shared token
   cache would be an opt-in feature, not a bug fix.
 
-## Resolved on the fork (status as of session 17)
+## Resolved on the fork (status as of session 18)
 
 #854, #499, #874, #912, #861, #855, #859, #847, #911, #862, #848, #850, #686, #799, #681, #772, #722, #779, #155, #346, #650, #793, #813, #818, #246, #533, #783 (docs ddev/consommateur), #806 (numérotation umami + patches déjà corrigés), #611 (pattern next-auth preview), #653 (base_url rendered as a link in the next_site listing, kernel-tested), #696 (Path revalidator logs non-200 responses as warnings, kernel-tested), #615 (consumer collection path resolved via Url::fromRoute with a safe fallback, kernel-tested), #532 + #535 (version added to modules/next/package.json — no more yarn workspace warning; the workspace package is renamed next-drupal-module because the original "next" name shadowed the Next.js framework once versioned), #422 + #493 (preview secret expiration documented in known-issues.mdx: refresh the preview or raise secret_expiration),
 #325 (translatePath now sends Accept: application/json — the decoupled_router route requires the json format and older Drupal versions fail to negotiate application/vnd.api+json to it; jest-tested),
@@ -116,7 +116,10 @@ mergeable ones likely obsolete: #67, #306, #425, #446, #491.
 #521 (site resolver is already independent of draft mode in 2.x — the form select sits at the top level with no #states; its description only mentioned draft validation, now clarified to cover on-demand revalidation too),
 #297 (revalidating other routes only: uncheck Revalidate page and fill Additional paths — existing configuration, documented in revalidator.mdx),
 #63 (alias pattern changes: entity updates from the pattern regeneration trigger path revalidation in 2.x, and old paths are covered by the redirect-source flow of #911/#329 — the reporter confirmed the sync works after cache rebuild),
-#286 (default locale prefix: workaround locked in with a test — omitting defaultLocale keeps the locale prefix for prefixed-default Drupal setups; an explicit configuration option remains a deferred enhancement, direction acknowledged upstream).
+#286 (default locale prefix: workaround locked in with a test — omitting defaultLocale keeps the locale prefix for prefixed-default Drupal setups; an explicit configuration option remains a deferred enhancement, direction acknowledged upstream),
+#135 (React Native: the 2.x core client has no runtime dependency on Next.js — only draft.ts and use-menu import next/*, and they are separate entry points; FAQ entry added),
+#262 (yarn commands: the quick-start and umami guide already show npm and yarn alternatives),
+#263 (Docker: FAQ entry added — separate PHP and Node containers, NEXT_PUBLIC_DRUPAL_BASE_URL wiring, ddev quick-start pointer).
 
 Already resolved by adopted/other work (no further action): #148 (preview alerts already use a plain <a>, fix from the issue thread applied upstream), #740 (flaky coverage — Node bug mitigated by the .nvmrc v18.19 pin, referenced in .nvmrc), #838 (v1.6 menu link already correct), #581 (ESM + sideEffects:false already shipped), #746 (fixed by adopted PR #747),
 #589 (permission list incl. View all revisions already in the draft-mode guide),
@@ -172,7 +175,16 @@ placement block with a site selector in hybrid mode, not implemented),
 #147 (404 paths for untranslated nodes with multiple locales: deferred
 enhancement — filtering on langcode would change fallback behavior for sites
 relying on untranslated-path serving; workaround is separate getPathsFromContext
-calls per locale, as suggested upstream).
+calls per locale, as suggested upstream),
+#97 + #99 + #744 (module dependencies — making simple_oauth, subrequests,
+decoupled_router or pathauto optional: structuring decision, deferred. The
+preview plugins depend on simple_oauth, the draft url validation on
+decoupled_router; Drupal recipes (>= 10.3) were suggested upstream as the
+delivery mechanism. Needs its own design pass),
+#234 (usage catalog: community action upstream — maintainer planned a
+showcase; nothing to do in the fork),
+#321 (hacktoberfest topic: GitHub repository topic, maintainer action
+upstream; not applicable to the fork).
 Adopted upstream PRs: #865, #790, #791, #842, #904, #853, #844, #876, #856
 (adapted as `host` option), #860 (#846 was already fixed upstream by #887).
 
