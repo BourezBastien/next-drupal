@@ -50,7 +50,7 @@ export function useJsonaDeserialize() {
  * for interacting with a Drupal backend.
  */
 export class NextDrupal extends NextDrupalBase {
-  cache?: NextDrupalOptions["cache"]
+  cache?: NextDrupalOptions["cache"] | null
 
   deserializer: JsonDeserializer
 
@@ -541,7 +541,7 @@ export class NextDrupal extends NextDrupalBase {
 
     /* c8 ignore next 11 */
     if (options.withCache) {
-      const cached = (await this.cache.get(options.cacheKey)) as string
+      const cached = (await this.cache?.get(options.cacheKey ?? "")) as string
 
       if (cached) {
         this.debug(`Returning cached resource ${type} with id ${uuid}.`)
@@ -574,7 +574,7 @@ export class NextDrupal extends NextDrupalBase {
 
     /* c8 ignore next 3 */
     if (options.withCache) {
-      await this.cache.set(options.cacheKey, JSON.stringify(json))
+      await this.cache?.set(options.cacheKey ?? "", JSON.stringify(json))
     }
 
     return options.deserialize ? this.deserialize(json) : json
@@ -616,7 +616,7 @@ export class NextDrupal extends NextDrupalBase {
       isVersionable?: boolean
     } & JsonApiOptions &
       JsonApiWithNextFetchOptions
-  ): Promise<T> {
+  ): Promise<T | null> {
     options = {
       deserialize: true,
       isVersionable: false,
@@ -635,11 +635,12 @@ export class NextDrupal extends NextDrupalBase {
     })
 
     // If a resourceVersion is provided, assume entity type is versionable.
-    if (options.params.resourceVersion) {
+    if (options.params?.resourceVersion) {
       options.isVersionable = true
     }
 
-    const { resourceVersion = "rel:latest-version", ...params } = options.params
+    const { resourceVersion = "rel:latest-version", ...params } =
+      options.params ?? {}
 
     if (options.isVersionable) {
       params.resourceVersion = resourceVersion
@@ -818,7 +819,7 @@ export class NextDrupal extends NextDrupalBase {
     {
       path: string
       type: string
-      locale: Locale
+      locale?: Locale
       segments: string[]
     }[]
   > {
@@ -857,8 +858,10 @@ export class NextDrupal extends NextDrupalBase {
                 ...opts,
                 deserialize: true,
                 locale,
-                defaultLocale: options.defaultLocale,
-              }
+                ...(options.defaultLocale
+                  ? { defaultLocale: options.defaultLocale }
+                  : {}),
+              } as unknown as typeof opts
             }
             const resources = await this.getResourceCollection<
               JsonApiResourceWithPath[]
@@ -1097,14 +1100,14 @@ export class NextDrupal extends NextDrupalBase {
    * })
    * ```
    */
-  async getMenu<T = DrupalMenuItem>(
+  async getMenu<T extends DrupalMenuItem = DrupalMenuItem>(
     menuName: string,
     options?: JsonApiOptions &
       JsonApiWithCacheOptions &
       JsonApiWithNextFetchOptions
   ): Promise<{
     items: T[]
-    tree: T[]
+    tree?: DrupalMenuTree<DrupalMenuItem>
   }> {
     options = {
       withAuth: this.withAuth,
@@ -1116,7 +1119,7 @@ export class NextDrupal extends NextDrupalBase {
 
     /* c8 ignore next 9 */
     if (options.withCache) {
-      const cached = (await this.cache.get(options.cacheKey)) as string
+      const cached = (await this.cache?.get(options.cacheKey ?? "")) as string
 
       if (cached) {
         this.debug(`Returning cached menu items for ${menuName}.`)
@@ -1147,7 +1150,7 @@ export class NextDrupal extends NextDrupalBase {
       ? this.deserialize(data)
       : /* c8 ignore next */ data
 
-    const tree = new DrupalMenuTree(items)
+    const tree = new DrupalMenuTree(items as DrupalMenuItem[])
 
     const menu = {
       items,
@@ -1156,7 +1159,7 @@ export class NextDrupal extends NextDrupalBase {
 
     /* c8 ignore next 3 */
     if (options.withCache) {
-      await this.cache.set(options.cacheKey, JSON.stringify(menu))
+      await this.cache?.set(options.cacheKey ?? "", JSON.stringify(menu))
     }
 
     return menu
