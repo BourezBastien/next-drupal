@@ -10,3 +10,17 @@ If you're using Laravel Valet 2, there's a bug running JSON:API as reported [her
 ### Solution
 
 Upgrade to Laravel Valet 3 or use the patch from [laravel/valet#771](https://github.com/laravel/valet/issues/771).
+
+## The provided secret has expired
+
+When using the site previewer in Drupal, the **View** button can return
+`The provided secret has expired.` if you stay on the preview screen
+longer than the secret lifetime before clicking it.
+
+### Solution
+
+Preview secrets are short-lived by design. Their lifetime is controlled by
+the **Secret expiration time** setting of the preview URL generator at
+`/admin/config/services/next`. Refresh the preview screen to request a new
+preview URL, or increase the expiration time if your editors regularly
+spend more than 30 seconds on the preview screen before navigating.
