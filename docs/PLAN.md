@@ -40,6 +40,11 @@
 ### Dette dépendances dev (post-audit 2026-08-24)
 `yarn audit` : 1069 constats (29 critiques), tous dans la toolchain dev des examples/www/starters (node-tar, form-data via cypress 9 / vieux glob, etc.). Les dépendances **runtime du package publié** (jsona, qs 6.15.3, node-cache, next, react) sont propres. Traitement = projet dédié de modernisation (majors cypress 9→14, next 14→15 par exemple), pas des bumps au fil de l'eau.
 
+### E2E : chantier next_tests ENGAGÉ (session 5)
+- ✅ Module seed déterministe `modules/next/tests/modules/next_tests_seed` (type dédié + pages à titres/alias fixes) avec test kernel (32/32).
+- ⏭️ Suite : script d'installation de site complet (drush site:install + next + seed + config NextSite), puis specs Cypress smoke contre le seed, puis réécriture progressive des specs faker.
+- La demande de DB Chapter Three reste le raccourci (action Bastien, Slack #nextjs).
+
 ### strictNullChecks — TERMINÉ (session 3)
 Activé package-wide avec `noImplicitAny` : 0 erreur sur tout `src/` (y compris helpers deprecated). Types publics rendus honnêtes (`T | null`, `tree?: DrupalMenuTree`, ids numériques). Prochaine étape Phase 0 : `strict: true` complet (restent principalement `strictFunctionTypes`/`strictBindCallApply`), puis ESLint durci et PHPStan.
 
