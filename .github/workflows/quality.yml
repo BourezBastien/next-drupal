@@ -67,5 +67,5 @@ jobs:
           ../vendor/bin/phpunit -c core --no-coverage modules/next
         env:
           SYMFONY_DEPRECATIONS_HELPER: weak
-          SIMPLETEST_DB: sqlite://localhost/:memory:
+          SIMPLETEST_DB: "sqlite://localhost/:memory:"
           SIMPLETEST_BASE_URL: http://127.0.0.1:8080
