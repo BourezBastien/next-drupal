@@ -38,3 +38,18 @@ works on supported Next.js versions. Cached 404s, however, were not
 invalidated by `revalidatePath` in older Next.js releases — upgrade to
 Next.js 13.4 or later (Next 14/15 in the 2.x starters), where stale 404s are
 purged like any other page.
+
+## The site previewer iframe is blocked on Vercel
+
+Drupal's preview iframe refuses to embed the site when Vercel
+**Deployment Protection** is enabled:
+
+`Refused to display 'https://BRANCHNAME-git-preview-XX.vercel.app/' in a
+frame because it set 'X-Frame-Options' to 'deny'.`
+
+### Solution
+
+Vercel forces the `X-Frame-Options: deny` header on protected deployment
+URLs and it can not be overridden. Either disable Deployment Protection for
+the project (or serve the preview deployments from an unprotected domain),
+or open the preview URL in a new tab instead of embedding it in the iframe.
