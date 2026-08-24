@@ -79,9 +79,15 @@ mergeable ones likely obsolete: #67, #306, #425, #446, #491.
   the site resolver actually resolving sites for the canonical entity, and the
   `site_previewer` setting.
 
-## Resolved on the fork (status as of session 2)
+## Classified as by-design (do not force a fix)
 
-#854, #499, #874, #912, #861, #855, #859, #847, #911, #862, #848, #850.
+- **#776** (multiple OAuth tokens): each server process generates and caches its own
+  token (build workers + runtime instances). Expected behavior; a shared token
+  cache would be an opt-in feature, not a bug fix.
+
+## Resolved on the fork (status as of session 3)
+
+#854, #499, #874, #912, #861, #855, #859, #847, #911, #862, #848, #850, #686, #799, #681, #772, #722, #779.
 Adopted upstream PRs: #865, #790, #791, #842, #904, #853, #844, #876, #856
 (adapted as `host` option), #860 (#846 was already fixed upstream by #887).
 

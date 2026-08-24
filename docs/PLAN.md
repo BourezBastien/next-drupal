@@ -7,8 +7,8 @@
 
 ## État d'avancement (mis à jour 2026-08-24, session 3)
 
-### Issues GitHub résolues et mergées sur main (15)
-#854 (locale prefix), #499 (type promote), #874 (meta relationships), #912 (sous-répertoire), #861 (locale + cache tags), #855 (debug sites vides), #859 (lien live révisions), #847 (docs preview→draft), #911 (revalider la source des redirects, avec test kernel), #862 + #848 (docs du revalidator cache_tag), #850 (pagination des chemins statiques, avec tests), #686 (types `drupal_internal__*id` en number), #799 (`credentials` seulement si le runtime le supporte, avec test), #681 (contrainte du générique de `getMenu` — réglée par le retypage `T extends DrupalMenuItem`).
+### Issues GitHub résolues et mergées sur main (18)
+#854 (locale prefix), #499 (type promote), #874 (meta relationships), #912 (sous-répertoire), #861 (locale + cache tags), #855 (debug sites vides), #859 (lien live révisions), #847 (docs preview→draft), #911 (revalider la source des redirects, avec test kernel), #862 + #848 (docs du revalidator cache_tag), #850 (pagination des chemins statiques, avec tests), #686 (types `drupal_internal__*id` en number), #799 (`credentials` seulement si le runtime le supporte, avec test), #681 (contrainte du générique de `getMenu` — réglée par le retypage `T extends DrupalMenuItem`), #772 (starter : notFound() au lieu de throw → la revalidation à la dépublication réussit), #722 (option withMeta sur getResourceCollection → {results, meta, links} avec type DrupalResourceCollection), #779 (l'événement d'entité porte la langue → le chemin de la traduction supprimée est revalidé, test kernel).
 
 ### PR upstream adoptées (avec attribution Co-authored-by)
 #865, #790, #791, #842, #904, #853 (durci + test SSG), #844 (durci garde null), #876, #856 (réimplémenté en option `host` explicite), #860. #846 déjà résolue en amont (#887). Dependabot : qs → 6.15.3 et nanoid → 3.3.18 appliqués nous-mêmes (remplace #908, #929).
