@@ -1,0 +1,9 @@
+name: 'Next tests seed'
+type: module
+description: 'Seeds deterministic content for end-to-end testing of Next.js sites. Installed on test sites; not for production.'
+package: Testing
+core_version_requirement: ^10 || ^11
+dependencies:
+  - drupal:node
+  - drupal:path
+  - drupal:menu_ui

@@ -1,0 +1,62 @@
+<?php
+
+/**
+ * @file
+ * Install hooks for the deterministic end-to-end test seed.
+ */
+
+declare(strict_types=1);
+
+use Drupal\node\Entity\Node;
+use Drupal\node\Entity\NodeType;
+
+/**
+ * Implements hook_install().
+ *
+ * Creates a fixed set of content so end-to-end tests can assert exact
+ * values. Everything created here is deterministic: titles, aliases and
+ * body text never change between runs.
+ */
+function next_tests_seed_install(): void {
+  // A dedicated content type keeps the seed independent of the profile.
+  if (!NodeType::load('next_test_page')) {
+    NodeType::create([
+      'type' => 'next_test_page',
+      'name' => 'Next test page',
+      'display_submitted' => FALSE,
+    ])->save();
+  }
+
+  $pages = [
+    'home' => [
+      'title' => 'Next tests home',
+      'alias' => '/next-tests/home',
+      'body' => 'Deterministic home page body for next-drupal end-to-end tests.',
+    ],
+    'about' => [
+      'title' => 'Next tests about',
+      'alias' => '/next-tests/about',
+      'body' => 'Deterministic about page body for next-drupal end-to-end tests.',
+    ],
+  ];
+
+  $storage = \Drupal::entityTypeManager()->getStorage('node');
+
+  foreach ($pages as $key => $values) {
+    $uuid = '00000000-0000-0000-0000-0000000000' . ($key === 'home' ? '1' : '2');
+    if ($storage->loadByProperties(['uuid' => $uuid])) {
+      continue;
+    }
+    Node::create([
+      'type' => 'next_test_page',
+      'title' => $values['title'],
+      'path' => ['alias' => $values['alias']],
+      'body' => [
+        'value' => $values['body'],
+        'format' => 'plain_text',
+      ],
+      'status' => 1,
+      'uuid' => $uuid,
+    ])->save();
+  }
+}
