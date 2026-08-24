@@ -1,6 +1,6 @@
 <?php
 
-declare(strict_types = 1);
+declare(strict_types=1);
 
 namespace Drupal\next\Plugin\Next\SiteResolver;
 
@@ -46,7 +46,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * @SiteResolver(
  *  id = "entity_owner",
  *  label = "Entity owner (author)",
- *  description = "The site selector plugin selects the site based on entity owner (author).",
+ *  description = "Selects the site based on the entity owner.",
  * )
  */
 class EntityOwner extends ConfigurableSiteResolverBase implements ContainerFactoryPluginInterface {
@@ -172,7 +172,7 @@ class EntityOwner extends ConfigurableSiteResolverBase implements ContainerFacto
             return $user->uuid();
           }, $users);
         }, $form_state->getValue('sites')),
-      )
+      ),
     ]);
   }
 
@@ -203,7 +203,7 @@ class EntityOwner extends ConfigurableSiteResolverBase implements ContainerFacto
       [
         '#theme' => 'item_list',
         '#items' => $items,
-        '#empty' => $this->t('No mappings defined yet')
+        '#empty' => $this->t('No mappings defined yet'),
       ],
     ];
 
