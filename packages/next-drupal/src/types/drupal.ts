@@ -68,6 +68,7 @@ export interface DrupalNode extends JsonApiResourceWithPath {
   title: string
   default_langcode: boolean
   sticky: boolean
+  promote: boolean
 }
 
 export interface DrupalParagraph extends JsonApiResource {
