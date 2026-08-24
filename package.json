@@ -28,6 +28,7 @@
     "seed": "NUM_NODES=200 node ./scripts/seed",
     "cy:open": "turbo run cy:open --parallel",
     "test": "yarn workspace next-drupal test",
+    "test:builds": "yarn workspace next-drupal prepare && node scripts/verify-builds.mjs",
     "pretest": "yarn format:check && yarn lint",
     "test:e2e": "turbo run test:e2e --parallel",
     "test:e2e:ci": "turbo run test:e2e:ci --parallel",
