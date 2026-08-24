@@ -39,6 +39,7 @@ class SiteResolverManagerTest extends KernelTestBase {
   public function testDefinitions() {
     $definitions = $this->siteResolverManager->getDefinitions();
     $this->assertEqualsCanonicalizing([
+      'entity_owner',
       'entity_reference_field',
       'site_selector',
     ], array_keys($definitions));
