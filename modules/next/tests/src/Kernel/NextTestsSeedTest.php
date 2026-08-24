@@ -14,7 +14,7 @@ class NextTestsSeedTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['filter', 'node', 'path', 'path_alias', 'system', 'text', 'user'];
+  protected static $modules = ['filter', 'menu_link_content', 'link', 'node', 'path', 'path_alias', 'system', 'text', 'user'];
 
   /**
    * {@inheritdoc}
@@ -25,6 +25,7 @@ class NextTestsSeedTest extends KernelTestBase {
     $this->installEntitySchema('node');
     $this->installEntitySchema('user');
     $this->installEntitySchema('path_alias');
+    $this->installEntitySchema('menu_link_content');
     $this->installSchema('node', ['node_access']);
     $this->installConfig(['filter']);
   }
@@ -58,6 +59,14 @@ class NextTestsSeedTest extends KernelTestBase {
     $this->assertNotFalse($about);
     $this->assertSame('Next tests about', $about->label());
     $this->assertSame('/next-tests/about', $this->getAlias($about));
+
+    // A menu link points at the home page. (The second home revision is
+    // asserted by the end-to-end specs against the installed site: kernel
+    // tests do not run the module installer's full save pipeline.)
+    $links = \Drupal::entityTypeManager()->getStorage('menu_link_content')->loadByProperties([
+      'title' => 'Next tests home link',
+    ]);
+    $this->assertCount(1, $links);
   }
 
   /**
