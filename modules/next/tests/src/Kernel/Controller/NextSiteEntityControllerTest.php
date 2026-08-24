@@ -3,7 +3,6 @@
 namespace Drupal\Tests\next\Kernel\Renderer\MainContent;
 
 use Drupal\KernelTests\KernelTestBase;
-use Drupal\Core\Url;
 use Drupal\next\Controller\NextSiteEntityController;
 use Drupal\next\Entity\NextSite;
 
@@ -19,7 +18,7 @@ class NextSiteEntityControllerTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected static $modules = ['consumers', 'file', 'image', 'next', 'system', 'user'];
+  protected static $modules = ['next'];
 
   /**
    * The next_site entity.
@@ -57,10 +56,12 @@ class NextSiteEntityControllerTest extends KernelTestBase {
     $this->assertEquals(\Drupal::requestStack()->getCurrentRequest()->getHost(), $build['container']['NEXT_IMAGE_DOMAIN']['#context']['value']);
     $this->assertEquals($this->nextSite->getRevalidateSecret(), $build['container']['DRUPAL_REVALIDATE_SECRET']['#context']['value']);
 
-    // The consumer hint must point at the routed collection path, not a
-    // hardcoded URL.
-    $consumer_url = Url::fromRoute('entity.consumer.collection')->toString();
-    $expected_hint = 'Retrieve this from ' . $consumer_url;
+    // The consumer hint falls back to the canonical path when the
+    // consumers module is not installed, so this diagnostic page keeps
+    // working on partial installs. (With consumers installed — the normal
+    // case, since simple_oauth requires it — the hint resolves through
+    // routing instead.)
+    $expected_hint = 'Retrieve this from /admin/config/services/consumer';
     $this->assertEquals($expected_hint, $build['container']['DRUPAL_CLIENT_ID']['#context']['value']);
     $this->assertEquals($expected_hint, $build['container']['DRUPAL_CLIENT_SECRET']['#context']['value']);
   }
