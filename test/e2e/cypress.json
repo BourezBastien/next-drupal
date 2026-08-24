@@ -1,0 +1,6 @@
+{
+  "baseUrl": "http://127.0.0.1:8090",
+  "integrationFolder": "cypress/integration",
+  "video": false,
+  "screenshotOnRunFailure": false
+}
