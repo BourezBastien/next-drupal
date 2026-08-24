@@ -440,6 +440,8 @@ export class NextDrupalPages extends NextDrupal {
     return await this.translatePath(path, {
       withAuth:
         this.getAuthFromContextAndOptions(context, options) ?? undefined,
+      locale: context.locale,
+      defaultLocale: context.defaultLocale,
     })
   }
 
