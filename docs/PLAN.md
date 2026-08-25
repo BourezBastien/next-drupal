@@ -5,7 +5,12 @@
 
 ---
 
-## État d'avancement (mis à jour 2026-08-25, session 32)
+## État d'avancement (mis à jour 2026-08-25, session 33)
+
+### CLI create-drupal-app (session 33)
+`packages/create-drupal-app` : scaffolding de nouveaux projets depuis les starters du fork — zéro dépendance npm (Node ≥18 + git sparse-clone), options --starter/--repo/--branch/--drupal-url/--skip-git, projet généré autonome (next-drupal depuis npm). Testée de bout en bout (scaffold + renommage + .env.local + git init + cas limites). Publication npm possible depuis ce dossier.
+
+## État d'avancement (session 32)
 
 ### Tracker du fork (session 32)
 Les 163 issues miroir du tracker du fork (créées le 2024-08-24 à partir des issues upstream) ont toutes été fermées avec leur décision de triage en commentaire (référence upstream + pointeur vers docs/PLAN.md et le skill). **0 issues ouvertes sur le fork.**
