@@ -63,4 +63,21 @@ npx cypress run --project test/e2e
 
 The legacy example suites under `examples/*/cypress` assert content
 that only exists in Chapter Three's private test database; obtaining a
-copy is tracked in `docs/PLAN.md`.
+copy is tracked in `docs/PLAN.md` (ready-to-post request in
+`docs/SLACK-DB-REQUEST.md`).
+
+## Playwright
+
+The deterministic pipeline also ships a Playwright suite mirroring the
+Cypress specs (13 tests each). It lives in `test/e2e` with its own
+`package.json` (independent from the root workspaces):
+
+```
+cd test/e2e
+npm install
+npx playwright install chromium
+npx playwright test
+```
+
+When browser downloads are blocked, use the system browser channel:
+`PLAYWRIGHT_CHANNEL=msedge npx playwright test`.
