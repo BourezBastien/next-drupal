@@ -19,7 +19,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 18.19
+          # The repo pins Node 18.19 for Jest (#740), but Playwright 1.62
+          # requires Node 20+. The e2e job is independent of that pin.
+          node-version: 22
           cache: yarn
       - uses: shivammathur/setup-php@v2
         with:
