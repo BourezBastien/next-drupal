@@ -47,3 +47,40 @@ any machine.
 - [x] Decoupled router path resolution
 - [ ] Full Next.js app build + rendering specs (next step: build a starter
       against this site and extend the specs)
+
+## Playwright (parallel suite)
+
+The same deterministic pipeline is covered by a Playwright suite mirroring
+the Cypress specs (same seeded content, same assertions):
+
+```
+cd test/e2e
+npm install                       # installs @playwright/test locally
+npx playwright install chromium   # or use the system browser, see below
+npx playwright test               # Drupal on :8090, Next.js app on :3000
+```
+
+The `test/e2e/package.json` is intentionally independent from the monorepo
+workspaces so the root `yarn.lock` stays untouched.
+
+### Sandboxed environments
+
+When the Playwright browser download is blocked, run the browser tests on
+the system Chromium (Edge on Windows):
+
+```
+PLAYWRIGHT_CHANNEL=msedge npx playwright test
+```
+
+## Operational pitfalls (updated)
+
+- **Never recopy `modules/next` into `.phpunit-drupal/web/modules` while the
+  PHP server is running.** On Windows the `rm -rf` of the target silently
+  fails on locked files and the copy nests (`web/modules/next/next`), which
+  breaks the site with `AssertionError` on `next/next/next.info.yml`. Always
+  stop the PHP server first (`taskkill /F /IM php.exe`), then remove, copy,
+  purge caches and restart.
+- After reinstalling the site or replacing module code, a full reset may be
+  needed: purge the `cache_*` tables of `web/e2e.sqlite`, delete
+  `web/sites/default/files/php` (container dump), `drush cr`, restart the
+  server.
