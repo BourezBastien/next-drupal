@@ -5,7 +5,12 @@
 
 ---
 
-## État d'avancement (mis à jour 2026-08-24, session 20)
+## État d'avancement (mis à jour 2026-08-25, session 32)
+
+### Tracker du fork (session 32)
+Les 163 issues miroir du tracker du fork (créées le 2024-08-24 à partir des issues upstream) ont toutes été fermées avec leur décision de triage en commentaire (référence upstream + pointeur vers docs/PLAN.md et le skill). **0 issues ouvertes sur le fork.**
+
+## État d'avancement (session 20)
 
 ### Mode opératoire (directive Bastien, session 19)
 Parcours des issues ouvertes **par ordre croissant de numéro** (#1 → dernière) au lieu de vagues thématiques : chaque issue reçoit une décision (fix + gates, doc, classification, ou deferral justifié). Reprise au plus petit numéro ouvert non traité.
