@@ -13,6 +13,8 @@ import { defineConfig } from "@playwright/test"
 export default defineConfig({
   testDir: "./playwright",
   timeout: 30_000,
+  // Launching the system browser channel can be flaky on shared machines.
+  retries: process.env.CI ? 0 : 1,
   use: {
     // The Drupal site. The Next.js app runs on port 3000 and is addressed
     // with absolute URLs from the rendering specs.
