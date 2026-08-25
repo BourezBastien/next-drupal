@@ -84,3 +84,14 @@ PLAYWRIGHT_CHANNEL=msedge npx playwright test
   needed: purge the `cache_*` tables of `web/e2e.sqlite`, delete
   `web/sites/default/files/php` (container dump), `drush cr`, restart the
   server.
+
+### Git Bash on Windows: environment variables holding paths
+
+Git Bash rewrites values that look like Unix paths: `DRUPAL_FRONT_PAGE=/next-tests/home`
+becomes `C:/Program Files/Git/next-tests/home` in the Node process. Prefix
+build/start commands with `MSYS_NO_PATHCONV=1`:
+
+```
+MSYS_NO_PATHCONV=1 DRUPAL_BASE_URL=http://127.0.0.1:8090 \
+  DRUPAL_FRONT_PAGE=/next-tests/home npx next build
+```

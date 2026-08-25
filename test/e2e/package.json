@@ -3,6 +3,6 @@
   "private": true,
   "description": "Playwright suite for the deterministic end-to-end pipeline. Independent from the monorepo workspaces so the root yarn.lock stays untouched.",
   "devDependencies": {
-    "@playwright/test": "1.49.1"
+    "@playwright/test": "^1.62.1"
   }
 }

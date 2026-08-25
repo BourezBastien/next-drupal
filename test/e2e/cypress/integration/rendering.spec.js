@@ -27,4 +27,11 @@ context("Rendering", () => {
       expect(response.status).to.eq(404)
     })
   })
+
+  it("renders the configured front page at the app root", () => {
+    // The Next.js app runs with DRUPAL_FRONT_PAGE=/next-tests/home.
+    cy.visit(`${app}/`)
+    cy.get("[data-cy=node-title]").should("have.text", "Next tests home")
+    cy.get("[data-cy=node-type]").should("have.text", "node--next_test_page")
+  })
 })
