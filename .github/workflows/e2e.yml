@@ -1,0 +1,56 @@
+name: E2E
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  playwright:
+    name: Playwright - deterministic pipeline
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18.19
+          cache: yarn
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: dom, curl, libxml, mbstring, zip, pdo, sqlite, pdo_sqlite, gd
+          coverage: none
+      - name: Install the seeded Drupal site
+        run: bash test/e2e/install-drupal.sh
+      - name: Start the Drupal server
+        run: |
+          cd .phpunit-drupal
+          nohup ./vendor/bin/drush runserver 127.0.0.1:8090 > drush.log 2>&1 &
+      - name: Install root dependencies (workspaces)
+        run: yarn install --frozen-lockfile
+      - name: Build and start the Next.js app
+        run: |
+          cd test/e2e/next-app
+          DRUPAL_BASE_URL=http://127.0.0.1:8090 DRUPAL_FRONT_PAGE=/next-tests/home npx next build
+          nohup env DRUPAL_BASE_URL=http://127.0.0.1:8090 DRUPAL_FRONT_PAGE=/next-tests/home npx next start -p 3000 > next.log 2>&1 &
+      - name: Wait for both servers
+        run: |
+          curl -s --retry 20 --retry-delay 3 --retry-connrefused -o /dev/null http://127.0.0.1:8090/jsonapi
+          curl -s --retry 20 --retry-delay 3 --retry-connrefused -o /dev/null http://127.0.0.1:3000/next-tests/home
+      - name: Run Playwright
+        run: |
+          cd test/e2e
+          npm ci
+          npx playwright install --with-deps chromium
+          npx playwright test
+      - name: Dump server logs on failure
+        if: failure()
+        run: |
+          tail -n 50 .phpunit-drupal/drush.log || true
+          tail -n 50 test/e2e/next-app/next.log || true
