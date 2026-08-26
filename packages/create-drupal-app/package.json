@@ -1,0 +1,18 @@
+{
+  "name": "create-drupal-app",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Scaffold Next.js for Drupal projects from the starters of this repository. Local to this fork: not published, private blocks npm publish.",
+  "license": "MIT",
+  "bin": {
+    "create-drupal-app": "bin/create-drupal-app.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BourezBastien/next-drupal",
+    "directory": "packages/create-drupal-app"
+  }
+}
