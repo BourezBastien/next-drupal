@@ -3,19 +3,15 @@
 Scaffolds a new **Next.js for Drupal** project from the starters of this
 repository — with zero npm dependencies (plain Node ≥ 18 and git).
 
-## Usage
+> **Scope: this fork only.** The package is `private` and is not published
+> anywhere: it lives in `BourezBastien/next-drupal` and is meant to be run
+> from the repository (or a clone of it). `npm publish` is blocked by the
+> `private` flag.
 
-From the repository (before an eventual npm publication):
+## Usage
 
 ```sh
 node packages/create-drupal-app/bin/create-drupal-app.js my-site
-```
-
-Once published to npm (name reservation and `npm publish` from this
-directory), it becomes:
-
-```sh
-npx create-drupal-app my-site
 ```
 
 ## Options
