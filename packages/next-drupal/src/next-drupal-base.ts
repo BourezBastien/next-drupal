@@ -420,6 +420,9 @@ export class NextDrupalBase {
   /**
    * Adds a locale prefix to the given path.
    *
+   * The prefix is only skipped when the locale is already a complete
+   * path segment.
+   *
    * @param {string} path The path.
    * @param {Object} options The options for adding the locale prefix.
    * @param {Locale} options.locale The locale.
@@ -437,7 +440,9 @@ export class NextDrupalBase {
     }
 
     let localePrefix = ""
-    if (locale && !path.startsWith(`/${locale}`) && locale !== defaultLocale) {
+    const isPrefixedWithLocale =
+      path === `/${locale}` || path.startsWith(`/${locale}/`)
+    if (locale && !isPrefixedWithLocale && locale !== defaultLocale) {
       localePrefix = `/${locale}`
     }
 

@@ -33,6 +33,68 @@ describe("addLocalePrefix()", () => {
       })
     ).toBe("/es/foo")
   })
+
+  test("adds locale prefix when path starts with the same characters as the locale", () => {
+    expect(
+      drupal.addLocalePrefix("/enable/testing", {
+        locale: "en",
+        defaultLocale: "fi",
+      })
+    ).toBe("/en/enable/testing")
+  })
+
+  test("does not add locale prefix when path is already prefixed", () => {
+    expect(
+      drupal.addLocalePrefix("/es/foo", {
+        locale: "es",
+        defaultLocale: "en",
+      })
+    ).toBe("/es/foo")
+  })
+
+  test("does not add locale prefix when path is the locale root", () => {
+    expect(
+      drupal.addLocalePrefix("/es", {
+        locale: "es",
+        defaultLocale: "en",
+      })
+    ).toBe("/es")
+  })
+
+  test("adds locale prefix when path starts with the locale characters and a trailing slash", () => {
+    expect(
+      drupal.addLocalePrefix("/enable/testing/", {
+        locale: "en",
+        defaultLocale: "fi",
+      })
+    ).toBe("/en/enable/testing/")
+  })
+
+  test("does not add locale prefix for multi-subtag locales", () => {
+    expect(
+      drupal.addLocalePrefix("/en-gb/foo", {
+        locale: "en-gb",
+        defaultLocale: "en",
+      })
+    ).toBe("/en-gb/foo")
+  })
+
+  test("adds locale prefix to a relative path starting with the locale characters", () => {
+    expect(
+      drupal.addLocalePrefix("enable/testing", {
+        locale: "en",
+        defaultLocale: "fi",
+      })
+    ).toBe("/en/enable/testing")
+  })
+
+  test("adds locale prefix when only a locale is given", () => {
+    expect(
+      drupal.addLocalePrefix("/foo", {
+        locale: "es",
+      })
+    ).toBe("/es/foo")
+  })
 })
 
 describe("buildUrl()", () => {
