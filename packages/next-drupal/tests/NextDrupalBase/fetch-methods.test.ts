@@ -221,6 +221,41 @@ describe("fetch()", () => {
       })
     )
   })
+
+  test("allows overriding the credentials option", async () => {
+    const drupal = new NextDrupalBase(BASE_URL)
+
+    const fetchSpy = spyOnFetch()
+
+    await drupal.fetch(mockUrl, {
+      credentials: "omit",
+    })
+
+    expect(fetchSpy).toBeCalledTimes(1)
+    expect(fetchSpy).toBeCalledWith(
+      mockUrl,
+      expect.objectContaining({
+        credentials: "omit",
+      })
+    )
+  })
+
+  test("passes an explicit credentials: undefined through untouched", async () => {
+    const drupal = new NextDrupalBase(BASE_URL)
+
+    const fetchSpy = spyOnFetch()
+
+    // Some runtimes (e.g. Cloudflare Workers) do not support the credentials
+    // option and only allow an explicit undefined.
+    await drupal.fetch(mockUrl, {
+      credentials: undefined,
+    })
+
+    expect(fetchSpy).toBeCalledTimes(1)
+    const init = fetchSpy.mock.calls[0][1]
+    expect("credentials" in init).toBe(true)
+    expect(init?.credentials).toBeUndefined()
+  })
 })
 
 describe("getAccessToken()", () => {

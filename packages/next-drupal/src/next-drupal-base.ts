@@ -199,7 +199,13 @@ export class NextDrupalBase {
     input: RequestInfo,
     { withAuth, ...init }: FetchOptions = {}
   ): Promise<Response> {
-    init.credentials = "include"
+    // Only default to "include" when the caller did not pass a credentials
+    // option. Some runtimes (e.g. Cloudflare Workers) do not support the
+    // credentials option and throw when it is set, so an explicit
+    // `credentials: undefined` must be passed through untouched.
+    if (!("credentials" in init)) {
+      init.credentials = "include"
+    }
 
     // Merge the init.headers with this.headers
     const headers = new Headers(this.headers)
