@@ -954,13 +954,19 @@ export class NextDrupal extends NextDrupalBase {
    * Fetches the JSON:API index.
    *
    * @param {Locale} locale The locale for the request.
-   * @param {JsonApiWithNextFetchOptions} options Options for the request.
+   * @param {JsonApiWithAuthOption & JsonApiWithNextFetchOptions} options Options for the request.
    * @returns {Promise<JsonApiResponse>} The JSON:API index.
    */
   async getIndex(
     locale?: Locale,
-    options?: JsonApiWithNextFetchOptions
+    options?: JsonApiWithAuthOption & JsonApiWithNextFetchOptions
   ): Promise<JsonApiResponse> {
+    options = {
+      // As per https://www.drupal.org/node/2984034 /jsonapi is public.
+      withAuth: false,
+      ...options,
+    }
+
     const endpoint = await this.buildEndpoint({
       locale,
     })
@@ -968,10 +974,9 @@ export class NextDrupal extends NextDrupalBase {
     this.debug(`Fetching JSON:API index.`)
 
     const response = await this.fetch(endpoint, {
-      // As per https://www.drupal.org/node/2984034 /jsonapi is public.
-      withAuth: false,
-      next: options?.next,
-      cache: options?.cache,
+      withAuth: options.withAuth,
+      next: options.next,
+      cache: options.cache,
     })
 
     await this.throwIfJsonErrors(
