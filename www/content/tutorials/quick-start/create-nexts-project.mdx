@@ -5,7 +5,7 @@ weight: 60
 group: Quick Start
 ---
 
-Now that we have completed the Drupal configuration, we can create our Next.js project.
+Now that we have enabled the modules, we can create our Next.js project and connect it to Drupal.
 
 We are going to use the [basic starter](https://github.com/chapter-three/next-drupal/tree/master/starters/basic-starter).
 
@@ -21,6 +21,21 @@ npx create-next-app -e https://github.com/chapter-three/next-drupal-basic-starte
 
 ---
 
+## Add a Next.js Site in Drupal
+
+To connect a Next.js project, you need to add a Next.js site on the Drupal side:
+
+1. Navigate to `/admin/config/services/next`.
+2. Press **Add Next.js site** and follow the instructions. Enter the base URL of your Next.js site (i.e. `http://localhost:3000`) and save.
+
+<Callout>
+
+Tip: Press **Environment variables** for your site at `/admin/config/services/next` to see the environment variables for your Next.js project. You can copy and paste these values in your `.env.local` file.
+
+</Callout>
+
+---
+
 ## Connect Drupal
 
 To connect the Next.js project to Drupal, we use [environment variables](https://nextjs.org/docs/basic-features/environment-variables).
@@ -32,6 +47,17 @@ To connect the Next.js project to Drupal, we use [environment variables](https:/
 NEXT_PUBLIC_DRUPAL_BASE_URL=http://example.com
 NEXT_IMAGE_DOMAIN=example
 ```
+
+The starter's `.env.example` also includes variables for authentication and on-demand revalidation:
+
+- `DRUPAL_CLIENT_ID` and `DRUPAL_CLIENT_SECRET`: retrieve or create a consumer at `/admin/config/services/consumer` and copy its **UUID** (client id) and **Secret** (client secret).
+- `DRUPAL_REVALIDATE_SECRET`: use the same secret you entered for the **Revalidate secret** of your site in `/admin/config/services/next`.
+
+<Callout icon="⚠️">
+
+**Using DDEV?** The Next.js app must reach Drupal through the DDEV hostname, not `localhost`. Use the site's DDEV URL (i.e. `https://my-drupal-site.ddev.site`) for `NEXT_PUBLIC_DRUPAL_BASE_URL`.
+
+</Callout>
 
 ---
 

@@ -22,10 +22,6 @@ export const guidesConfig: GuidesConfig = {
           href: "/guides/jsonapi-params",
         },
         {
-          title: "TypeScript",
-          href: "/guides/typescript",
-        },
-        {
           title: "Inline Images",
           href: "/guides/inline-images",
         },
