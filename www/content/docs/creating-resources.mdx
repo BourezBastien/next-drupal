@@ -92,6 +92,8 @@ This will create a `file--file` resource.
 
 You can then use this to create a new `media--image` with a relationship to the `file--file`.
 
+Use `meta` on the relationship data to set the alt text of the image.
+
 ```ts
 const media = await drupal.createResource<DrupalMedia>("media--image", {
   data: {
@@ -103,6 +105,11 @@ const media = await drupal.createResource<DrupalMedia>("media--image", {
         data: {
           type: "file--file",
           id: file.id,
+          // highlight-start
+          meta: {
+            alt: "Accessible description of the image",
+          },
+          // highlight-end
         },
       },
     },

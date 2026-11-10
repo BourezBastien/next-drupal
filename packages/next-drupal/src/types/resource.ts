@@ -23,6 +23,7 @@ export interface JsonApiResourceBodyRelationship {
   data: {
     type: string
     id: string
+    meta?: Record<string, any>
   }
 }
 

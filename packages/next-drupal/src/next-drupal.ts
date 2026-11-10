@@ -239,7 +239,8 @@ export class NextDrupal extends NextDrupalBase {
    * })
    * ```
    *
-   * You can then use this to create a new media--image with a relationship to the file:
+   * You can then use this to create a new media--image with a relationship to the file.
+   * Use `meta` on the relationship data to set the alt text of the image:
    * ```ts
    * const media = await drupal.createResource<DrupalMedia>("media--image", {
    *   data: {
@@ -251,6 +252,9 @@ export class NextDrupal extends NextDrupalBase {
    *         data: {
    *           type: "file--file",
    *           id: file.id,
+   *           meta: {
+   *             alt: "Accessible description of the image",
+   *           },
    *         },
    *       },
    *     },
