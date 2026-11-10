@@ -94,6 +94,45 @@ describe("buildUrl()", () => {
   })
 })
 
+describe("buildUrl() with a subdirectory baseUrl", () => {
+  const SUBDIR_BASE_URL = "https://example.com/drupal/web"
+  const drupal = new NextDrupalBase(SUBDIR_BASE_URL)
+
+  test("keeps the base path for root-relative paths", () => {
+    expect(drupal.buildUrl("/foo").toString()).toEqual(`${SUBDIR_BASE_URL}/foo`)
+  })
+
+  test("keeps the base path for root-relative paths with searchParams", () => {
+    expect(
+      drupal.buildUrl("/router/translate-path", { path: "/about" }).toString()
+    ).toEqual(`${SUBDIR_BASE_URL}/router/translate-path?path=%2Fabout`)
+  })
+
+  test("does not double-prefix paths that already include the base path", () => {
+    expect(drupal.buildUrl("/drupal/web/foo").toString()).toEqual(
+      `${SUBDIR_BASE_URL}/foo`
+    )
+  })
+
+  test("prefixes paths that only share a prefix with the base path", () => {
+    expect(drupal.buildUrl("/drupal/webfoo").toString()).toEqual(
+      `${SUBDIR_BASE_URL}/drupal/webfoo`
+    )
+  })
+
+  test("does not modify absolute URLs", () => {
+    expect(drupal.buildUrl("https://other.com/foo").toString()).toEqual(
+      "https://other.com/foo"
+    )
+  })
+
+  test("does not modify protocol-relative URLs", () => {
+    expect(drupal.buildUrl("//other.com/foo").toString()).toEqual(
+      "https://other.com/foo"
+    )
+  })
+})
+
 describe("buildEndpoint()", () => {
   const drupal = new NextDrupalBase(BASE_URL)
 

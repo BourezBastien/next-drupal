@@ -310,9 +310,29 @@ export class NextDrupalBase {
    * // https://example.com/jsonapi/node/article?sort=-created&fields%5Bnode--article%5D=title%2Cpath
    * drupal.buildUrl("/jsonapi/node/article", params).toString()
    * ```
+   *
+   * Build a URL when the Drupal site is installed in a subdirectory
+   * ```ts
+   * const drupal = new DrupalClient("https://example.com/drupal/web")
+   *
+   * // https://example.com/drupal/web/jsonapi/node/article
+   * drupal.buildUrl("/jsonapi/node/article").toString()
+   * ```
    */
   buildUrl(path: string, searchParams?: EndpointSearchParams): URL {
-    const url = new URL(path, this.baseUrl)
+    // If the baseUrl contains a path (e.g. Drupal installed in a subdirectory
+    // such as https://example.com/drupal/web), root-relative paths must be
+    // prefixed with it: new URL() drops the base path for absolute paths.
+    const basePath = new URL(this.baseUrl).pathname.replace(/\/+$/, "")
+    const fullPath =
+      basePath &&
+      path.startsWith("/") &&
+      !path.startsWith("//") &&
+      !(path === basePath || path.startsWith(`${basePath}/`))
+        ? `${basePath}${path}`
+        : path
+
+    const url = new URL(fullPath, this.baseUrl)
 
     const search =
       // Handle DrupalJsonApiParams objects.
